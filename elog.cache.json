@@ -933,7 +933,7 @@
         "updated": "2025-07-24 16:45:00"
       },
       "realName": "web component",
-      "relativePath": "\\web component.md",
+      "relativePath": "/web component.md",
       "needUpdate": 1,
       "docPath": "./docs/notion"
     },
@@ -1634,7 +1634,7 @@
         "updated": "2025-07-24 16:51:00"
       },
       "realName": "作用域和作用域链",
-      "relativePath": "\\作用域和作用域链.md",
+      "relativePath": "/作用域和作用域链.md",
       "needUpdate": 1,
       "docPath": "./docs/notion"
     },
@@ -1807,8 +1807,7 @@
         "updated": "2025-07-24 16:17:00"
       },
       "realName": "tsconfig",
-      "relativePath": "\\tsconfig.md",
-      "needUpdate": 1,
+      "relativePath": "/tsconfig.md",
       "docPath": "./docs/notion"
     },
     {
@@ -1975,8 +1974,7 @@
         "updated": "2025-07-24 14:08:00"
       },
       "realName": "问题记录",
-      "relativePath": "\\问题记录.md",
-      "needUpdate": 1,
+      "relativePath": "/问题记录.md",
       "docPath": "./docs/notion"
     },
     {
@@ -2493,8 +2491,7 @@
         "updated": "2025-07-24 16:20:00"
       },
       "realName": "prettier",
-      "relativePath": "\\prettier.md",
-      "needUpdate": 1,
+      "relativePath": "/prettier.md",
       "docPath": "./docs/notion"
     },
     {
@@ -2538,7 +2535,7 @@
         "updated": "2025-07-24 16:17:00"
       },
       "realName": "eslint",
-      "relativePath": "\\eslint.md",
+      "relativePath": "/eslint.md",
       "needUpdate": 1,
       "docPath": "./docs/notion"
     },
@@ -2955,8 +2952,7 @@
         "updated": "2025-07-24 16:51:00"
       },
       "realName": "JavaScript",
-      "relativePath": "\\JavaScript.md",
-      "needUpdate": 1,
+      "relativePath": "/JavaScript.md",
       "docPath": "./docs/notion"
     },
     {
@@ -3221,7 +3217,7 @@
         "updated": "2025-07-24 16:48:00"
       },
       "realName": "web性能",
-      "relativePath": "\\web性能.md",
+      "relativePath": "/web性能.md",
       "needUpdate": 1,
       "docPath": "./docs/notion"
     },
@@ -3310,7 +3306,7 @@
         "updated": "2025-07-24 16:44:00"
       },
       "realName": "研运项目",
-      "relativePath": "\\研运项目.md",
+      "relativePath": "/研运项目.md",
       "needUpdate": 1,
       "docPath": "./docs/notion"
     }
