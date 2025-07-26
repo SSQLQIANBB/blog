@@ -750,7 +750,10 @@ function ItemList({ artworks, onToggle }) {
 ## 状态管理
 
 <details>
-<summary>通过向组件传递一个唯一 `key`（如 `<Chat key={email}/>` 来 _强制_ 重置其状态</summary>
+<summary>_强制_ 重置其状态</summary>
+
+通过向组件传递一个唯一 `key`（如 `<Chat key={email} />` 来 _强制_ 重置其状态
+
 
 ```javascript
 import { useState } from 'react';
