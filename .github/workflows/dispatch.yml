@@ -33,7 +33,7 @@ jobs:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: docs/.vitepress/dist
 
-        - name: 处理事件
-          run: |
-          echo "触发类型: ${{ github.event.action }}"  # 输出事件类型（如 deploy-trigger）
-          echo "传递数据: ${{ toJson(github.event.client_payload) }}"  # 输出附带数据
+        # - name: 处理事件
+        #   run: |
+        #   echo "触发类型: ${{ github.event.action }}"  # 输出事件类型（如 deploy-trigger）
+        #   echo "传递数据: ${{ toJson(github.event.client_payload) }}"  # 输出附带数据
