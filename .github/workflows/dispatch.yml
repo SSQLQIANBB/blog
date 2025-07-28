@@ -1,16 +1,39 @@
-name: 外部触发工作流
+name: api手动触发
 on:
   repository_dispatch:
     # 限定事件类型（避免无关请求触发）
     types:
-      - deploy-trigger  # 自定义类型1
-      - sync-data       # 自定义类型2
+      - deploy-trigger  # 部署
+      - sync-data       # 自定义类型2同步数据
 
 jobs:
   handle-event:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 处理事件
-        run: |
+        # 检出代码
+        - uses: actions/checkout@v2
+        # node
+        - uses: actions/setup-node@v3
+          with:
+            node-version: 20
+        - run: npm i pnpm -g
+        - run: pnpm install
+
+        - name: sync
+          run: pnpm sync
+
+        - name: Build
+          run: pnpm docs:build
+
+
+        - name: Deploy
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: docs/.vitepress/dist
+
+        - name: 处理事件
+          run: |
           echo "触发类型: ${{ github.event.action }}"  # 输出事件类型（如 deploy-trigger）
           echo "传递数据: ${{ toJson(github.event.client_payload) }}"  # 输出附带数据
