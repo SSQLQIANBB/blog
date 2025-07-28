@@ -1,3 +1,4 @@
+name: manual-deploy
 on: 
   repository_dispatch:
     types:
