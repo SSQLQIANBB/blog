@@ -3,29 +3,30 @@ on:
   push:
     branches:
       - master
-    tags-ignore:  # 保留tags-ignore（如果需要）
+    tags-ignore:
       - '**'
 
 jobs:
   call-reusable-workflow:
     runs-on: ubuntu-latest
     steps:
-      # 新增步骤：过滤包含[bot]的提交
+      # 步骤1：先检出代码仓库（关键！初始化 Git 环境）
+      - uses: actions/checkout@v2  # 必须放在最前面，确保工作目录有 .git 目录
+
+      # 步骤2：过滤包含[bot]的提交
       - name: 检查提交信息，忽略机器人提交
         run: |
-          # 获取触发工作流的提交信息
+          # 现在可以正常执行 git 命令了
           COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
           echo "当前提交信息: $COMMIT_MESSAGE"
           
-          # 如果提交信息包含[bot]，则终止工作流（不执行后续步骤）
           if [[ $COMMIT_MESSAGE == *"[bot]"* ]]; then
             echo "检测到机器人提交，终止工作流"
-            exit 0  # 正常退出，不标记为失败
+            exit 0
           fi
 
-      # 只有非机器人提交才会执行到这里
+      # 步骤3：调用可复用工作流
       - name: 调用可复用工作流
         uses: ./.github/workflows/reusable-workflow.yml
         with:
           trigger-source: "push"
-    
