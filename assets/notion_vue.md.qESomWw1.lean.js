@@ -1,0 +1,1 @@
+import{_ as i,c as a,o as n,ae as h}from"./chunks/framework.C7odH_dJ.js";const g=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"notion/vue.md","filePath":"notion/vue.md"}'),l={name:"notion/vue.md"};function t(k,s,p,e,E,r){return n(),a("div",null,s[0]||(s[0]=[h("",47)]))}const y=i(l,[["render",t]]);export{g as __pageData,y as default};
