@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "牧风夕大佬",
   description: "个人博客",
+  base: '/blog/',
   vite: {
     assetsInclude: ['**/*.awebp']
   },
