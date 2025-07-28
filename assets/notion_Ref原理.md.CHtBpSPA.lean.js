@@ -1,0 +1,1 @@
+import{_ as i,c as a,o as n,ae as h}from"./chunks/framework.U1Gow_7P.js";const g=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"notion/Ref原理.md","filePath":"notion/Ref原理.md"}'),l={name:"notion/Ref原理.md"};function p(t,s,k,e,E,r){return n(),a("div",null,s[0]||(s[0]=[h("",1)]))}const y=i(l,[["render",p]]);export{g as __pageData,y as default};

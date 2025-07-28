@@ -1,0 +1,1 @@
+import{_ as i,c as a,o as n,ae as h}from"./chunks/framework.U1Gow_7P.js";const g=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"notion/设计模式.md","filePath":"notion/设计模式.md"}'),k={name:"notion/设计模式.md"};function l(p,s,t,e,E,r){return n(),a("div",null,s[0]||(s[0]=[h("",1)]))}const y=i(k,[["render",l]]);export{g as __pageData,y as default};
