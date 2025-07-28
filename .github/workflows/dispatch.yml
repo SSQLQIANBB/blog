@@ -2,11 +2,13 @@ name: api手动触发
 on:
   repository_dispatch:
     types:
-      - deploy-trigger  # 部署触发
-      - sync-data       # 数据同步触发
+      - deploy-trigger
+      - sync-data
 
 jobs:
-  call-reusable-workflow:
-    uses: ./.github/workflows/reusable-workflow.yml
+  # 直接在jobs级别调用可复用工作流（关键！）
+  call-deploy-workflow:
+    uses: ./.github/workflows/reusable-workflow.yml  # 引用可复用工作流
     with:
-      trigger-source: "api"  # 标识触发来源为API
+      trigger-source: "api"  # 传递参数
+    secrets: inherit  # 传递仓库密钥

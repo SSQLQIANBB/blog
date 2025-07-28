@@ -7,26 +7,9 @@ on:
       - '**'
 
 jobs:
-  call-reusable-workflow:
-    runs-on: ubuntu-latest
-    steps:
-      # 步骤1：先检出代码仓库（关键！初始化 Git 环境）
-      - uses: actions/checkout@v2  # 必须放在最前面，确保工作目录有 .git 目录
-
-      # 步骤2：过滤包含[bot]的提交
-      - name: 检查提交信息，忽略机器人提交
-        run: |
-          # 现在可以正常执行 git 命令了
-          COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
-          echo "当前提交信息: $COMMIT_MESSAGE"
-          
-          if [[ $COMMIT_MESSAGE == *"[bot]"* ]]; then
-            echo "检测到机器人提交，终止工作流"
-            exit 0
-          fi
-
-      # 步骤3：调用可复用工作流
-      - name: 调用可复用工作流
-        uses: ./.github/workflows/reusable-workflow.yml
-        with:
-          trigger-source: "push"
+  # 直接在jobs级别调用可复用工作流（关键！）
+  call-deploy-workflow:
+    uses: ./.github/workflows/reusable-workflow.yml  # 引用可复用工作流
+    with:
+      trigger-source: "push"  # 传递参数
+    secrets: inherit  # 传递仓库密钥（如NOTION_TOKEN）
