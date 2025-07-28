@@ -5,7 +5,7 @@
 [bookmark](https://libuv.org/)
 
 > 学习完node学习ollama; 本地已下载安装 ollama run mistral
-> **node并发调试：ab -k -c 20 -n 250 "**[**http://localhost:8080/auth?username=matt&password=password**](http://localhost:8080/auth?username=matt&password=password)**"**
+> **node并发调试：****`ab -k -c 20 -n 250 "http://localhost:8080/auth?username=matt&password=password"`**
 
 文档：
 

@@ -11,7 +11,7 @@
 Chrome 开发者工具中的 **Coverage** 面板可以帮助您找到未使用的 JavaScript 和 CSS 代码。移除未使用的代码可以加快网页加载速度，并节省用户的移动数据流量。
 
 
-![analyzing-code-coverage.png](https://developer.chrome.com/static/docs/devtools/coverage/image/analyzing-code-coverage.png?hl=zh-cn)
+![analyzing-code-coverage.png](/notion/images/fa9874892d6f5b7f6181f2641711216f.png)
 
 
 ## 记录代码覆盖率
@@ -32,7 +32,7 @@ Chrome 开发者工具中的 **Coverage** 面板可以帮助您找到未使用
 点击某一行即可在**来源**面板中打开该资源，并查看已使用代码和未使用的代码逐行细分。所有未使用的代码行都会用红线标记，列旁边会显示行号。
 
 
-![code-coverage-report.png](https://developer.chrome.com/static/docs/devtools/coverage/image/code-coverage-report.png?hl=zh-cn)
+![code-coverage-report.png](/notion/images/0001b1e669fee8f11eea55884ecfb5fc.png)
 
 - **网址**列是所分析资源的网址。
 - **Type** 列显示资源是包含 CSS 和/或 JavaScript。
@@ -263,7 +263,7 @@ webpack的懒加载机制
     标记浏览器渲染来自 DOM 第一位内容的时间点，该内容可能是文本、图像、SVG 甚至 元素。
 
 
-        ![FCP.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/FCP.png)
+        ![FCP.png](/notion/images/4acfdf22eb63b61bcfd8fb548d30f307.png)
 
 - **LCP (Largest Contentful Paint) 最大内容渲染**
 
@@ -273,13 +273,13 @@ webpack的懒加载机制
     LCP的数据会通过PerformanceEntry对象记录, 每次出现更大的内容渲染, 则会产生一个新的PerformanceEntry对象.(2019年11月新增)。
 
 
-    ![LCP-1.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/LCP-1.png)
+    ![LCP-1.png](/notion/images/57c7f256edb68884f48a628be949bec0.png)
 
 
     根据google建议，为了给用户提供更好的产品体验，LCP应该低于2.5s。
 
 
-![LCP-2.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/LCP-2.png)
+![LCP-2.png](/notion/images/05dfd82adcaa7ab4461fafe06af1d66e.png)
 
 - **DCL (DomContentloaded)**
 
@@ -305,7 +305,7 @@ webpack的懒加载机制
     来个例子说明一下:
 
 
-![TBT-1.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/TBT-1.png)
+![TBT-1.png](/notion/images/000fb2e4df01ea324b9e84a669d0f541.png)
 
 
    
@@ -314,7 +314,7 @@ webpack的懒加载机制
     上图，有三个长任务，两个短任务。
 
 
-![TBT-2.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/TBT-2.png)
+![TBT-2.png](/notion/images/097d43f0d5fba0f9d6ac80ac0902c024.png)
 
 
     在主线程上运行任务所花费的总时间为560毫秒，但TBT只有345(200 + 40 + 105)毫秒的时间，被     视为阻塞时间(超过50ms的Task都会被记录).
@@ -324,20 +324,20 @@ webpack的懒加载机制
     FID (First Input Delay) 首次输入延迟: 指标衡量的是从用户首次与您的网站进行交互（即当他们单击链接，点击按钮等）到浏览器实际能够访问之间的时间, 下面来张图来解释FID和TTI的区别:
 
 
-![FID-1.webp](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/FID-1.webp)
+![FID-1.webp](/notion/images/0391194bf88f060b5910950a8127abdb.webp)
 
 
     根据google建议，为了给用户提供更好的产品体验，FID应该低于100ms。
 
 
-![FID-2.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/FID-2.png)
+![FID-2.png](/notion/images/0d939042a049978a92fa97e3c0d33e31.png)
 
 - **CLS (Cumulative Layout Shift) 累积布局偏移**
 
     CLS (Cumulative Layout Shift) 累积布局偏移: 总结起来就是一个元素初始时和其hidden之间的任何时间如果元素偏移了, 则会被计算进去, 具体的计算方法可看这篇文章 [[https://web.dev/cls/]](https://web.dev/cls/])
 
 
-![CLS.png](https://songyazhao.github.io/2020/11/02/Web%20Performance%E5%B8%B8%E8%A7%81%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/CLS.png)
+![CLS.png](/notion/images/299da2da27b1f103f2d3af54560ce8ca.png)
 
 - **SI (Speed Index)**
 
