@@ -1,4 +1,10 @@
 
+redis启动：redis-server;
+
+
+mysql: mysql -u root -p;
+
+
 pip3安装依赖
 
 - pip3 freeze 查看已安装；
