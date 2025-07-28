@@ -1,0 +1,70 @@
+name: Reusable Deploy Workflow
+on:
+  workflow_call:
+    inputs:
+      trigger-source:
+        description: "触发来源（api/push）"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v2
+
+      # 安装 Node 环境
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # 安装依赖
+      - run: npm i pnpm -g
+      - run: pnpm install
+
+      # 【关键修改】仅 API 触发时才拉取 Notion 文章
+      - name: 拉取 Notion 的文章（仅 API 触发）
+        if: inputs.trigger-source == 'api'  # 条件判断：仅 api 来源执行
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: pnpm sync
+
+      # 检查是否有变更（API 触发可能因 Notion 同步产生变更，push 触发可能因代码提交产生变更）
+      - name: 检查是否有变更
+        id: check-changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      # 提交变更（仅当有变更时）
+      - name: 提交变更
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git config --global user.name "SSQLQIANBB"
+          git config --global user.email "1215323732@qq.com"
+          echo `date +"%Y-%m-%d %H:%M:%S"` begin > time.txt
+          git add .
+          git commit -m "[bot] 更新文档（触发来源：${{ inputs.trigger-source }}）"
+
+      # 推送变更（仅当有变更时）
+      - name: 推送文章到仓库
+        if: steps.check-changes.outputs.has_changes == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 构建文档（无论来源，都需要构建最新代码）
+      - name: 构建文档
+        run: pnpm docs:build
+
+      # 部署到 gh-pages（无论来源，都部署最新构建结果）
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/.vitepress/dist

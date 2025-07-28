@@ -1,56 +1,31 @@
 name: Deploy-Blog
-
-on: 
-    push:
-        branches: 
-            - master
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:  # 保留tags-ignore（如果需要）
+      - '**'
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-
-        steps:
-        # 检出代码
-        - uses: actions/checkout@v2
-        # node
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 20
-        - run: npm i pnpm -g
-        - run: pnpm install
-
-        - name: 拉取Notion的文章
-          env:
+  call-reusable-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      # 新增步骤：过滤包含[bot]的提交
+      - name: 检查提交信息，忽略机器人提交
+        run: |
+          # 获取触发工作流的提交信息
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+          echo "当前提交信息: $COMMIT_MESSAGE"
           
-            # Notion相关环境变量
-            NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-            NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          run: |
-            # 对应package.json中的script.sync
-            pnpm sync
+          # 如果提交信息包含[bot]，则终止工作流（不执行后续步骤）
+          if [[ $COMMIT_MESSAGE == *"[bot]"* ]]; then
+            echo "检测到机器人提交，终止工作流"
+            exit 0  # 正常退出，不标记为失败
+          fi
 
-        - name: 配置Git用户名邮箱
-          run: |
-            git config --global user.name "SSQLQIANBB"
-            git config --global user.email "1215323732@qq.com"
-
-        - name: 提交notion拉取的文章到GitHub仓库
-          run: |
-            echo `date +"%Y-%m-%d %H:%M:%S"` begin > time.txt
-            git add .
-            git commit -m "更新文档" -a
-
-        - name: 推送文章到仓库
-          uses: ad-m/github-push-action@master
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-
-        - name: Build
-          run: pnpm docs:build
-
-
-        - name: Deploy
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: docs/.vitepress/dist
+      # 只有非机器人提交才会执行到这里
+      - name: 调用可复用工作流
+        uses: ./.github/workflows/reusable-workflow.yml
+        with:
+          trigger-source: "push"
+    
