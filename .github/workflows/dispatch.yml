@@ -1,15 +1,16 @@
-name: manual-deploy
-on: 
+name: 外部触发工作流
+on:
   repository_dispatch:
+    # 限定事件类型（避免无关请求触发）
     types:
-      - webhook-1
-      - webhook-2
+      - deploy-trigger  # 自定义类型1
+      - sync-data       # 自定义类型2
 
 jobs:
-  run:
+  handle-event:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Hello World
-      run: |
-        echo Hello World!
+      - name: 处理事件
+        run: |
+          echo "触发类型: ${{ github.event.action }}"  # 输出事件类型（如 deploy-trigger）
+          echo "传递数据: ${{ toJson(github.event.client_payload) }}"  # 输出附带数据
