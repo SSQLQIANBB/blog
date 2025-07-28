@@ -1,4 +1,16 @@
 
+**Redis**
+
+
+redis启动：redis-server;
+
+
+**mysql**
+
+
+mysql: mysql -u root -p;
+
+
 **libuv** 
 
 
