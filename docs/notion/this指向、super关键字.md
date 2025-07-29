@@ -102,7 +102,7 @@ const obj = {
 `apply` 方法与 `call` 方法类似，但是它接受一个参数数组而不是参数列表。这意味着您可以将参数作为数组传递给函数。
 
 
-```arduino
+```javascript
 function greet(greeting, punctuation) {
   console.log(greeting + ", " + this.name + punctuation);
 }

@@ -1,5 +1,6 @@
 // import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
+import { sidebar, sidebar as ToolSidebar } from "./tool";
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
@@ -32,16 +33,19 @@ export default withMermaid({
     ],
     outline: [1, 3], // 大纲中显示的标题级别
     aside: true,
-    sidebar: [
-      {
-        text: 'Guide',
-        collapsed: true,
-        items: [
-          { text: 'Introduction', link: '/page'},
-          { text: 'Getting Started', link: '/frontmatter' },
-        ],
-      }
-    ],
+    sidebar: {
+      '/tools/vitepress/': ToolSidebar,
+    },
+    // sidebar: [
+    //   {
+    //     text: 'Guide',
+    //     collapsed: true,
+    //     items: [
+    //       { text: 'Introduction', link: '/page'},
+    //       { text: 'Getting Started', link: '/frontmatter' },
+    //     ],
+    //   }
+    // ],
 
     socialLinks: [
       { icon: "github", link: "https://github.com/SSQLQIANBB/blog" },
@@ -53,13 +57,13 @@ export default withMermaid({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2019-present'
     },
-    lastUpdated: {
-      text: 'Updated at',
-      formatOptions: {
-        dateStyle: 'full',
-        timeStyle: 'medium'
-      }
-    },
+    // lastUpdated: {
+    //   text: 'Updated at',
+    //   formatOptions: {
+    //     dateStyle: 'full',
+    //     timeStyle: 'medium'
+    //   }
+    // },
     // 页脚编辑
     editLink: {
       pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
