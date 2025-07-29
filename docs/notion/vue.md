@@ -245,17 +245,17 @@ diff算法
 直接使用双重for循环
 
 
-    ```javascript
-    for (let i = 0; i < newChildren.length; i++) {
-      const newChild = newChildren[i];
-      for (let j = 0; j < oldChildren.length; j++) {
-        const oldChild = oldChildren[j];
-        if (newChild === oldChild) {
-          // ...
-        }
-      }
+```javascript
+for (let i = 0; i < newChildren.length; i++) {
+  const newChild = newChildren[i];
+  for (let j = 0; j < oldChildren.length; j++) {
+    const oldChild = oldChildren[j];
+    if (newChild === oldChild) {
+      // ...
     }
-    ```
+  }
+}
+```
 
 
 如果仅仅是最后一项修改；前面要遍历16次；
