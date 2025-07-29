@@ -137,3 +137,8 @@
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 
+.mermaid-container {
+  background-color: var(--vp-code-block-bg);
+  padding: 12px;
+}
+

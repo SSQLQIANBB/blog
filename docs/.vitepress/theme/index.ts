@@ -2,15 +2,19 @@
 import { h } from 'vue'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+import Layout from './layout.vue'; // 自定义layout组件
 import './style.css'
 
 export default {
   extends: DefaultTheme,
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      // https://vitepress.dev/guide/extending-default-theme#layout-slots
-    })
-  },
+  Layout,
+  // Layout: () => {
+  //   return h(DefaultTheme.Layout, null, {
+  //     // https://vitepress.dev/guide/extending-default-theme#layout-slots
+  //     // 'aside-outline-before': () => h('div', 'aside'), // 插槽
+  //     // 'layout-top': () => h('div', 'top')
+  //   })
+  // },
   enhanceApp({ app, router, siteData }) {
     // ...
   }
