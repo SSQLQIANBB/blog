@@ -1,1 +1,0 @@
-import{_ as e,c as r,o as a,ae as n}from"./chunks/framework.C7odH_dJ.js";const F=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"notion/脚手架搭建.md","filePath":"notion/脚手架搭建.md"}'),o={name:"notion/脚手架搭建.md"};function s(d,t,l,p,i,h){return a(),r("div",null,t[0]||(t[0]=[n("",5)]))}const g=e(o,[["render",s]]);export{F as __pageData,g as default};
