@@ -1,8 +1,11 @@
 
-pip3安装依赖
+## 步骤
 
-- pip3 freeze 查看已安装；
-- pip3 freeze | grep xxx 查找xxx依赖版本
+1. 安装python
+2. 查看pip版本：`python -m pip —version`
+3. pip3安装依赖:  `pip install django`
+4. `pip3 freeze` 查看已安装；
+5. `pip3 freeze | grep xxx` 查找xxx依赖版本 (linux)
 
 ### 一台机器Django多版本管理
 
