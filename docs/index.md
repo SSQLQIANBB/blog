@@ -1,31 +1,61 @@
 ---
+# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
   name: "牧风夕大佬"
-
-  tagline: 记录生活与技术  # 项目标语
+  text: "个人博客"
+  tagline: 前端工程师的个人技术博客，记录学习和工作中的点点滴滴
+  image:
+    src: /pig.svg
   actions:
     - theme: brand
-      text: 现在开始
-
+      text: 开始阅读
+      link: /notion/vue
     - theme: alt
-      text: View on GitHub
-navbar: true
-sidebar: true
+      text: 关于我
+      link: /about
+
 features:
-    - title: 前端
-      details: 记录前端的知识与经验
-      link: '/notion/vue'
-    - title: 后端
-      details: 记录后端的知识与经验
-    - title: 工作记录
-      details: 记录日常工作内容与笔记
-    - title: 工具
-      details: 记录工具的知识与经验
-      link: '/tools'
-    - title: 项目
-      details: 记录项目的知识与经验
-    - title: 思考
-      details: 记录思考的知识与经验
+  - icon: 📘
+    title: 前端技术
+    details: Vue、React、HTML、CSS、JavaScript、TypeScript等前端技术分享
+    link: /notion/vue
+    linkText: 查看更多
+  - icon: ⚙️
+    title: 工程化
+    details: Webpack、Vite、Babel、ESLint、Prettier等工程化工具使用经验
+    link: /notion/webpack
+    linkText: 查看更多
+  - icon: 🔧
+    title: 后端技术
+    details: Node.js、Python等后端技术实践
+    link: /notion/node
+    linkText: 查看更多
+  - icon: 💡
+    title: 计算机基础
+    details: 计算机网络、设计模式等基础知识总结
+    link: /notion/计算机网络
+    linkText: 查看更多
+  - icon: 🛠️
+    title: 开发工具
+    details: Git、Docker等开发工具使用技巧
+    link: /tools/
+    linkText: 查看更多
+  - icon: 📝
+    title: 工作记录
+    details: 工作中的问题解决和经验总结
+    link: /notion/工作记录
+    linkText: 查看更多
 ---
+
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  const heroImage = document.querySelector('.VPHeroImage img')
+  if (heroImage) {
+    heroImage.classList.add('fade-in')
+  }
+})
+</script>

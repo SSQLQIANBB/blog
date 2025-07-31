@@ -1,61 +1,40 @@
 // import { defineConfig } from "vitepress";
-import { withMermaid } from "vitepress-plugin-mermaid";
-import { sidebar, sidebar as ToolSidebar } from "./tool";
+import { withMermaid } from 'vitepress-plugin-mermaid';
+import { generateNav } from './nav-items';
+import { generateSidebar, allFiles } from './config-data';
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
-  title: "牧风夕大佬", // 站点的标题。document.title
-  // titleTemplate: 'OO',
-  description: "个人博客",
-  head: [["link", { rel: "icon", href: "/blog/favicon.ico" }]],
-  lang: "zh-Cn",
+  title: '牧风夕大佬', // 站点的标题。document.title
+  description: '个人博客',
+  head: [['link', { rel: 'icon', href: '/blog/favicon.svg' }]],
+  lang: 'zh-CN',
   cleanUrls: true,
   // 目录path <-> URL 映射
+  /*
   rewrites: {
     "notion/vue.md": "/vue",
+    "notion/工作记录.md": "/工作记录",
   },
-  srcDir: ".",
-  base: "/blog/",
+  */
+  rewrites: {},
+  srcDir: '.',
+  base: '/blog/',
   lastUpdated: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: '/favicon.ico',
-    nav: [
-      // { text: 'Guide', link: '/guide' },
-      // {
-      //   text: 'Dropdown Menu',
-      //   items: [
-      //     { text: 'Item A', link: '/item-1' },
-      //     { text: 'Item B', link: '/item-2' },
-      //     { text: 'Item C', link: '/item-3' }
-      //   ]
-      // }
-    ],
-    outline: [1, 3], // 大纲中显示的标题级别
+    logo: '/favicon.svg',
+    nav: generateNav(),
+    outline: [2, 3], // 大纲中显示的标题级别
     aside: true,
-    sidebar: {
-      '/tools/vitepress/': ToolSidebar,
-    },
-    // sidebar: [
-    //   {
-    //     text: 'Guide',
-    //     collapsed: true,
-    //     items: [
-    //       { text: 'Introduction', link: '/page'},
-    //       { text: 'Getting Started', link: '/frontmatter' },
-    //     ],
-    //   }
-    // ],
+    sidebar: generateSidebar(allFiles),
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/SSQLQIANBB/blog" },
-      { icon: 'x', link: 'https://github.com/SSQLQIANBB/blog' },
-      { icon: 'gmail', link: 'https://github.com/SSQLQIANBB/blog' },
-      { icon: 'telegram', link: 'https://github.com/SSQLQIANBB/blog' },
+      { icon: 'github', link: 'https://github.com/SSQLQIANBB/blog' },
     ],
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2019-present'
+      copyright: 'Copyright © 2019-present',
     },
     // lastUpdated: {
     //   text: 'Updated at',
@@ -66,17 +45,17 @@ export default withMermaid({
     // },
     // 页脚编辑
     editLink: {
-      pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
-      text: 'Edit this page on GitHub'
+      pattern: 'https://github.com/SSQLQIANBB/blog/edit/main/docs/:path',
+      text: '在 GitHub 上编辑此页面',
     },
     search: {
-      provider: 'local'
-    }
+      provider: 'local',
+    },
   },
   // 忽略因为死链导致构建失败；
   ignoreDeadLinks: true,
   mermaidPlugin: {
-    class: "mermaid-container", // set additional css classes for parent container
+    class: 'mermaid-container', // set additional css classes for parent container
   },
   // markdown配置
   markdown: {
@@ -84,11 +63,21 @@ export default withMermaid({
     image: {
       lazyLoading: true, // 图片懒加载
     },
-    toc: { level: [1, 2], listTag: "ol" },
+    toc: { level: [1, 2], listTag: 'ol' },
   },
-  // vite 配置
   vite: {
-    assetsInclude: ["**/*.awebp"],
+    assetsInclude: ['**/*.awebp'],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+          },
+        },
+      },
+    },
   },
   // vue 配置
   vue: {},

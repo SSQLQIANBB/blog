@@ -1,0 +1,156 @@
+/* .vitepress/theme/custom.css */
+:root {
+  --vp-c-brand: #646cff;
+  --vp-c-brand-light: #747bff;
+  --vp-c-brand-lighter: #9499ff;
+  --vp-c-brand-dark: #535bf2;
+  --vp-c-brand-darker: #454ce1;
+  --vp-c-tip: #21b8a3;
+  --vp-c-warning: #ffc53d;
+  --vp-c-danger: #ff6262;
+}
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    #bd34fe 30%,
+    #41d1ff
+  );
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #bd34fe 50%,
+    #47caff 50%
+  );
+  --vp-home-hero-image-filter: blur(40px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(56px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(72px);
+  }
+}
+
+.VPHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.VPHeroContent {
+  max-width: 50%;
+}
+
+.VPHeroImage {
+  max-width: 50%;
+  margin-left: auto;
+  filter: var(--vp-home-hero-image-filter);
+  transition: all 0.5s ease;
+}
+
+.VPHeroImage img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 新增过渡效果 */
+.VPHeroImage img.fade-in {
+  opacity: 0;
+  transform: scale(0.9);
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.VPHomeFeatures {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
+  padding-top: 2rem;
+}
+
+.VPHomeFeature {
+  background-color: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.VPHomeFeature:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.VPHomeFeatureIcon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.VPHomeFeatureTitle {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.VPHomeFeatureDetails {
+  color: var(--vp-c-text-2);
+}
+
+.VPHomeFeatureLink {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--vp-c-brand);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.VPHomeFeatureLink:hover {
+  color: var(--vp-c-brand-dark);
+}
+
+.VPHomeFeatures .VPLink:hover .box {
+  transform: translate(-2px, -2px);
+  transition: transform 0.3s ease;
+  border: 1px solid var(--vp-c-brand);
+}
+
+/* 优化代码块显示 */
+.vp-doc pre {
+  border-radius: 8px;
+}
+
+/* 优化表格显示 */
+.vp-doc table {
+  display: block;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.vp-doc tr {
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc th,
+.vp-doc td {
+  border: 1px solid var(--vp-c-divider);
+  padding: 0.6em 1em;
+}
+
+/* 优化图片显示 */
+.VPContent img {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}

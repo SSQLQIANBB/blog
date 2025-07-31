@@ -4,12 +4,16 @@
     "sync:local": "elog sync -e .elog.env",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "generate-config": "ts-node docs/.vitepress/generate-config.ts",
+    "update-config": "node update-config",
+    "clean-cache": "rm -rf docs/.vitepress/cache"
   },
   "devDependencies": {
     "@elog/cli": "^0.14.7",
     "less": "^4.4.0",
     "mermaid": "^11.9.0",
+    "ts-node": "^10.9.2",
     "vitepress": "^1.6.3",
     "vitepress-plugin-mermaid": "^2.0.17"
   },
