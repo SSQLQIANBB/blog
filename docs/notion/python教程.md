@@ -38,6 +38,9 @@ miniconda电脑安装位置：/opt/miniconda3
 conda activate
 
 
+## 初始化项目x
+
+
 创建项目
 
 
@@ -105,12 +108,203 @@ urlpatterns = [
 [**`path()`**](https://docs.djangoproject.com/zh-hans/5.2/ref/urls/#django.urls.path) 函数至少需要两个参数：**`route`** 和 **`view`**。[**`include()`**](https://docs.djangoproject.com/zh-hans/5.2/ref/urls/#django.urls.include) 函数允许引用其他 URLconfs。每当 Django 遇到 [**`include()`**](https://docs.djangoproject.com/zh-hans/5.2/ref/urls/#django.urls.include) 时，它会截断 URL 中匹配到该点的部分，并将剩余的字符串发送到包含的 URLconf 以进行进一步处理。
 
 
+创建数据库表
+
+
+```bash
+python manage.py migrate
+```
+
+
+创建模型 `polls/models.py`文件
+
+
+```python
+from django.db import models
+
+# Create your models here.
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField('date published')
+
+    def __str__(self):
+        return self.question_text
+    
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.choice_text
+```
+
+
+`mysite/settings.py` 中`INSTALL_APPS`中添加设置
+
+
+```python
+INSTALLED_APPS = [
+    "polls.apps.PollsConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]
+```
+
+
+现在你的 Django 项目会包含 **`polls`** 应用。接着运行下面的命令：
+
+
+```python
+python manage.py makemigrations polls
+```
+
+
+通过运行 **`makemigrations`** 命令，Django 会检测你对模型文件的修改（在这种情况下，你已经取得了新的），并且把修改的部分储存为一次 _迁移_。
+
+
+如果你想的话，你可以阅读一下你模型的迁移数据，它被储存在 **`polls/migrations/0001_initial.py`** 里。
+
+
+再次运行 [**`migrate`**](https://docs.djangoproject.com/zh-hans/5.2/ref/django-admin/#django-admin-migrate) 命令，在数据库里创建新定义的模型的数据表
 
 
 
+```python
+python manage.py migrate
+```
 
 
-# Django 模型（Models）与 ORM 操作指南
+![image.png](/notion/images/65a21633fdc81736dafc8048ddf11957.png)
+
+
+现在让我们进入交互式 Python 命令行，尝试一下 Django 为你创建的各种 API。通过以下命令打开 Python 命令行：
+
+
+```python
+python manage.py shell
+```
+
+
+## Django管理页面
+
+
+创建管理员账号
+
+
+```python
+python manage.py createsuperuser # admin/1215323.../admin123
+```
+
+
+添加Question对象
+
+
+```python
+from django.contrib import admin
+
+from .models import Question
+
+admin.site.register(Question)
+```
+
+
+`polls/views.py`新增视图
+
+
+```python
+def detail(request, question_id):
+    return HttpResponse("You're looking at question %s." % question_id)
+
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+
+def vote(request, question_id):
+    return HttpResponse("You're voting on question %s." % question_id)
+```
+
+
+新视图添加进 **`polls.urls`** 模块里
+
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    # ex: /polls/
+    path("", views.index, name="index"),
+    # ex: /polls/5/
+    path("<int:question_id>/", views.detail, name="detail"),
+    # ex: /polls/5/results/
+    path("<int:question_id>/results/", views.results, name="results"),
+    # ex: /polls/5/vote/
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+]
+```
+
+
+项目的 [**`TEMPLATES`**](https://docs.djangoproject.com/zh-hans/5.2/ref/settings/#std-setting-TEMPLATES) 配置项描述了 Django 如何载入和渲染模板。默认的设置文件设置了 **`DjangoTemplates`** 后端，并将 [**`APP_DIRS`**](https://docs.djangoproject.com/zh-hans/5.2/ref/settings/#std-setting-TEMPLATES-APP_DIRS) 设置成了 True。这一选项将会让 **`DjangoTemplates`** 在每个 [**`INSTALLED_APPS`**](https://docs.djangoproject.com/zh-hans/5.2/ref/settings/#std-setting-INSTALLED_APPS) 文件夹中寻找 "templates" 子目录。这就是为什么尽管我们没有像在第二部分中那样修改 DIRS 设置，Django 也能正确找到 polls 的模板位置的原因。
+
+
+在你的 **`polls`** 目录里创建一个 **`templates`** 目录。
+
+
+**`templates`** 目录里，再创建一个目录 **`polls`**，然后在其中新建一个文件 **`index.html`** 
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  {% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+  {% else %}
+      <p>No polls are available.</p>
+  {% endif %}
+</body>
+</html>
+```
+
+
+**`polls/views.py`** 里的 **`index`** 视图来使用模板
+
+
+```python
+from django.http import HttpResponse
+from django.template import loader
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    template = loader.get_template("polls/index.html")
+    context = {"latest_question_list": latest_question_list}
+    return HttpResponse(template.render(context, request))
+```
+
+
+
+Django 模型（Models）与 ORM 操作指南
 
 
 ## 模型定义示例
