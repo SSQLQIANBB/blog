@@ -41,7 +41,7 @@ conda activate
 创建项目
 
 
-`django-admin startproject djdemo`  
+`django-admin startproject mysite`  
 
 
 启动项目
@@ -54,6 +54,60 @@ conda activate
 
 
 `python3` [`manage.py`](http://manage.py/) `startapp   xxx(应用名称)`
+
+
+编写视图
+
+
+polls/views.py
+
+
+```python
+from django.http import HttpResponse
+
+
+def index(request):
+    return HttpResponse("Hello, world. You're at the polls index.")
+```
+
+
+定义URLConf, 创建**`polls/urls.py`** 的文件
+
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.index, name="index"),
+]
+```
+
+
+设置根目录的URLconf，包含polls/urls.py中定义的URLconf;
+
+
+**`mysite/urls.py`**
+
+
+```python
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("polls/", include("polls.urls")),
+    path("admin/", admin.site.urls),
+]
+```
+
+
+[**`path()`**](https://docs.djangoproject.com/zh-hans/5.2/ref/urls/#django.urls.path) 函数至少需要两个参数：**`route`** 和 **`view`**。[**`include()`**](https://docs.djangoproject.com/zh-hans/5.2/ref/urls/#django.urls.include) 函数允许引用其他 URLconfs。每当 Django 遇到 [**`include()`**](https://docs.djangoproject.com/zh-hans/5.2/ref/urls/#django.urls.include) 时，它会截断 URL 中匹配到该点的部分，并将剩余的字符串发送到包含的 URLconf 以进行进一步处理。
+
+
+
+
+
 
 
 # Django 模型（Models）与 ORM 操作指南
