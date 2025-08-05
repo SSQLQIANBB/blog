@@ -926,9 +926,9 @@ tsc 的命令行参数，大部分与 tsconfig.json 的属性一一对应。
 - `-checkJs`：对 JS 脚本进行类型检查。
 - `-declaration`：为 TS 脚本生成一个类型生成文件。
 - `-declarationDir`：指定生成的类型声明文件的所在目录。
-- `-declarationMap`：为`.d.ts`文件生成 SourceMap 文件。
+- `-declarationMap`：为`.d.ts`文件生成 Source有效
 - `-diagnostics`：构建后输出编译性能信息。
-- `-emitBOM`：在编译输出的 UTF-8 文件头部加上 BOM 标志。
+- 有效
 - `-emitDeclarationOnly`：只编译输出类型声明文件，不输出 JS 文件。
 - `-esModuleInterop`：更容易使用 import 命令加载 CommonJS 模块。
 - `-exactOptionalPropertyTypes`：不允许将可选属性设置为`undefined`。
@@ -991,3 +991,37 @@ tsc 的命令行参数，大部分与 tsconfig.json 的属性一一对应。
 - `-types`：设置`typeRoots`目录下需要包括在编译之中的类型模块。
 - `-version`：终端输出 tsc 的版本号。
 - `-watch`（或者`w`）：进入观察模式，只要文件有修改，就会自动重新编译。
+
+## 全局类型声明
+
+1. **TypeScript 对文件的两种处理方式**：
+    - **脚本文件**：没有 `import`/`export` 的文件，视为全局作用域，其中的声明会直接添加到全局。
+    - **模块文件**：包含 `import`/`export` 的文件，视为独立模块，其中的 `declare global` 用于**扩展全局作用域**（而非直接声明全局）。
+
+**有效**
+
+
+```typescript
+import type { Ref } from 'vue';
+
+declare global {
+  declare type Nullable<T> = T | null;
+
+  declare type RefType<T> = Ref<T | null>;
+}
+```
+
+
+文件不包含`import`时，需要使用`export{}`, 表明为独立模块才会在全局生效
+
+
+```typescript
+declare global {
+  declare type Nullable<T> = T | null;
+
+  declare type RefType<T> = Ref<T | null>;
+}
+
+export {}
+```
+
