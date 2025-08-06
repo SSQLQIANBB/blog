@@ -303,8 +303,152 @@ def index(request):
 ```
 
 
+使用快捷函数`render`
 
-Django 模型（Models）与 ORM 操作指南
+
+```python
+from django.shortcuts import render
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    context = {"latest_question_list": latest_question_list}
+    return render(request, "polls/index.html", context)
+```
+
+
+抛出404
+
+
+```python
+from django.http import Http404
+from django.shortcuts import render
+
+from .models import Question
+
+
+# ...
+def detail(request, question_id):
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        raise Http404("Question does not exist")
+    return render(request, "polls/detail.html", {"question": question})
+```
+
+
+`template/polls/detail.html`
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  {{ question }}
+</body>
+</html>
+```
+
+
+404快捷函数 [**`get_object_or_404()`**](https://docs.djangoproject.com/zh-hans/5.2/topics/http/shortcuts/#django.shortcuts.get_object_or_404)   [**`get_list_or_404()`**](https://docs.djangoproject.com/zh-hans/5.2/topics/http/shortcuts/#django.shortcuts.get_list_or_404)
+
+
+```python
+from django.http import render, get_object_or_404
+
+def detail(request, question_id):
+	question = get_object_or_404(Question, pk=question_id)
+	
+	return render(request, 'polls/detail.html', {"question": question})
+```
+
+
+模版语法
+
+
+polls/index.html
+
+
+```python
+<li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+# path("<int:question_id>/", views.detail, name="detail"),  detail对应name
+```
+
+
+### 为 URL 名称添加命名空间
+
+
+教程项目只有一个应用，**`polls`** 。在一个真实的 Django 项目中，可能会有五个，十个，二十个，甚至更多应用。Django 如何分辨重名的 URL 呢？举个例子，**`polls`** 应用有 **`detail`** 视图，可能另一个博客应用也有同名的视图。Django 如何知道 **`{% url %}`** 标签到底对应哪一个应用的 URL 呢？
+
+
+答案是：在根 URLconf 中添加命名空间。在 **`polls/urls.py`** 文件中稍作修改，加上 **`app_name`** 设置命名空间：
+
+
+`polls/urls.py`
+
+
+```python
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("<int:question_id>/", views.detail, name="detail"),
+    path("<int:question_id>/results/", views.results, name="results"),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+]
+```
+
+
+现在，编辑 **`polls/index.html`** 文件，从：
+
+
+```python
+<li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+```
+
+
+修改为指向具有命名空间的详细视图：
+
+
+`polls/templates/polls/index.html`
+
+
+```python
+<
+li
+><
+a
+ href
+=
+"
+{%
+ 
+url
+ 'polls:detail' question.id 
+%}
+">
+{{
+ question.question_text 
+}}
+</
+a
+></
+li
+>
+```
+
+
+# Django 模型（Models）与 ORM 操作指南
 
 
 ## 模型定义示例
@@ -534,4 +678,79 @@ Django ORM 通过双下划线（`__`）语法支持多种查询条件，以下�
 | `__in`          | 在指定列表中      | `id__in=[1, 2, 3]`（id为1、2、3中的一个）                                     |
 | `__range`       | 在指定范围内      | `pub_date__range=(start_date, end_date)`（发布日期在start_date和end_date之间） |
 | `__isnull`      | 是否为空        | `email__isnull=True`（邮箱为空）                                           |
+
+
+## python错误类型和继承关系
+
+
+```plain text
+BaseException
+ ├── BaseExceptionGroup
+ ├── GeneratorExit
+ ├── KeyboardInterrupt
+ ├── SystemExit
+ └── Exception
+      ├── ArithmeticError
+      │    ├── FloatingPointError
+      │    ├── OverflowError
+      │    └── ZeroDivisionError
+      ├── AssertionError
+      ├── AttributeError
+      ├── BufferError
+      ├── EOFError
+      ├── ExceptionGroup [BaseExceptionGroup]
+      ├── ImportError
+      │    └── ModuleNotFoundError
+      ├── LookupError
+      │    ├── IndexError
+      │    └── KeyError
+      ├── MemoryError
+      ├── NameError
+      │    └── UnboundLocalError
+      ├── OSError
+      │    ├── BlockingIOError
+      │    ├── ChildProcessError
+      │    ├── ConnectionError
+      │    │    ├── BrokenPipeError
+      │    │    ├── ConnectionAbortedError
+      │    │    ├── ConnectionRefusedError
+      │    │    └── ConnectionResetError
+      │    ├── FileExistsError
+      │    ├── FileNotFoundError
+      │    ├── InterruptedError
+      │    ├── IsADirectoryError
+      │    ├── NotADirectoryError
+      │    ├── PermissionError
+      │    ├── ProcessLookupError
+      │    └── TimeoutError
+      ├── ReferenceError
+      ├── RuntimeError
+      │    ├── NotImplementedError
+      │    ├── PythonFinalizationError
+      │    └── RecursionError
+      ├── StopAsyncIteration
+      ├── StopIteration
+      ├── SyntaxError
+      │    └── IndentationError
+      │         └── TabError
+      ├── SystemError
+      ├── TypeError
+      ├── ValueError
+      │    └── UnicodeError
+      │         ├── UnicodeDecodeError
+      │         ├── UnicodeEncodeError
+      │         └── UnicodeTranslateError
+      └── Warning
+           ├── BytesWarning
+           ├── DeprecationWarning
+           ├── EncodingWarning
+           ├── FutureWarning
+           ├── ImportWarning
+           ├── PendingDeprecationWarning
+           ├── ResourceWarning
+           ├── RuntimeWarning
+           ├── SyntaxWarning
+           ├── UnicodeWarning
+           └── UserWarning
+```
 
