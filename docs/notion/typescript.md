@@ -550,6 +550,9 @@ TypeScript 内置的类型描述文件，主要有以下一些，完整的清单
 它的默认值与`module`属性有关，如果`module`为`AMD`、`UMD`、`System`或`ES6/ES2015`，默认值为`classic`；如果`module`为`node16`或`nodenext`，默认值为这两个值；其他情况下,默认值为`Node`。
 
 
+相关文章：[https://juejin.cn/post/7221551421833314360#heading-33](https://juejin.cn/post/7221551421833314360#heading-33)
+
+
 ### **moduleSuffixes**
 
 
