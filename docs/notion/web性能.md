@@ -1,4 +1,7 @@
 > web性能是对网站或应用程序的客观度量和用户的体验，有以下主要方面
+
+![zp4wrjatnb.png](/notion/images/359a370e0d302d0f316b2753fb4e178a.png)
+
 1. 减少总体负载时间
 2. 尽快使网站可用： 网站从开始加载，到达到可用状态为止所需的时间被称为[交互等待时间](https://developer.mozilla.org/en-US/docs/Glossary/Time_to_interactive)
 3. 流畅性和交互性
