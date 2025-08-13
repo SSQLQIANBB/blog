@@ -148,6 +148,27 @@ nextTick(() => {
 ## 常见问题
 
 
+### watchEffect不被触发
+
+
+```typescript
+import { watchEffect, ref } from 'vue'
+
+const a= ref(true)
+const b= ref(false)
+
+watchEffect(() => {
+  if (a.value || b.value) {
+    console.log('a:', a.value)
+  }
+  
+  console.log('---b-change---')
+})
+
+function btnClick() {b.value = !b.value}
+```
+
+
 ### data为什么是函数
 
 
