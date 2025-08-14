@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as r,a as o}from"./app.DQNJVCEU.js";const p=JSON.parse('{"title":"关于","description":"","frontmatter":{},"headers":[],"relativePath":"about.md","filePath":"about.md","lastUpdated":1755065623000}'),l={name:"about.md"};function i(n,a,s,h,c,d){return r(),t("div",null,a[0]||(a[0]=[o("",10)]))}const _=e(l,[["render",i]]);export{p as __pageData,_ as default};
