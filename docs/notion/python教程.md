@@ -595,6 +595,29 @@ def vote(request, question_id):
 ```
 
 
+## 静态文件
+
+
+**`polls/static/polls/style.css`**
+
+
+```css
+li a {
+    color: green;
+}
+```
+
+
+**`polls/templates/polls/index.html`**
+
+
+```css
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'polls/style.css' %}">
+```
+
+
 # Django 模型（Models）与 ORM 操作指南
 
 
