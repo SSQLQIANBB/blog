@@ -618,6 +618,9 @@ li a {
 ```
 
 
+[bookmark](https://docs.djangoproject.com/zh-hans/5.2/intro/tutorial07/)
+
+
 # Django 模型（Models）与 ORM 操作指南
 
 
