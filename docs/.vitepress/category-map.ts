@@ -58,6 +58,7 @@ export const fileToCategoryMap: Record<string, string> = {
   'notion/babel.md': '工程化',
   'notion/eslint.md': '工程化',
   'notion/prettier.md': '工程化',
+  'notion/stylelint.md': '工程化',
   'notion/npm & yarn & pnpm.md': '工程化',
   'notion/工程化&模块化.md': '工程化',
   'notion/Commonjs和ES Module.md': '工程化',
@@ -87,4 +88,5 @@ export const fileToCategoryMap: Record<string, string> = {
   'notion/开发注意事项.md': '其他',
   'notion/notion持续部署github.md': '其他',
   'notion/阅读记录.md': '其他',
+
 };
