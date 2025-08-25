@@ -618,7 +618,188 @@ li a {
 ```
 
 
-[bookmark](https://docs.djangoproject.com/zh-hans/5.2/intro/tutorial07/)
+## 应用(section-7)
+
+
+`polls/admin.py`内容替换 **`admin.site.register(Question)`**：
+
+
+```python
+from django.contrib import admin
+
+from .models import Question
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fields = ["pub_date", "question_text"]
+
+
+admin.site.register(Question, QuestionAdmin)
+```
+
+
+字段集格式
+
+
+```python
+from django.contrib import admin
+
+from .models import Question
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+
+
+admin.site.register(Question, QuestionAdmin)
+```
+
+
+添加关联对象
+
+
+```python
+from django.contrib import admin
+
+from .models import Choice, Question
+
+# ...
+admin.site.register(Choice)
+```
+
+
+设置Question关联编辑对象
+
+
+```python
+from django.contrib import admin
+
+from .models import Choice, Question
+
+
+# class ChoiceInline(admin.StackedInline):
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 3
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"], "classes": ["collapse"]}),
+    ]
+    inlines = [ChoiceInline]
+
+
+admin.site.register(Question, QuestionAdmin)
+```
+
+
+`polls/admin.py`调整`Question`展示为表格多列
+
+
+```python
+class QuestionAdmin(admin.ModelAdmin):
+    # ...
+    list_display = ["question_text", "pub_date", "was_published_recently"]
+```
+
+
+排序
+
+
+```python
+from django.contrib import admin
+
+
+class Question(models.Model):
+    # ...
+    @admin.display(
+        boolean=True,
+        ordering="pub_date",
+        description="Published recently?",
+    )
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+```
+
+
+编辑文件 **`polls/admin.py`**，优化 **`Question`** 变更页：过滤器，使用 [**`list_filter`**](https://docs.djangoproject.com/zh-hans/5.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_filter)。将以下代码添加至 **`QuestionAdmin`**：
+
+
+添加过滤和搜索
+
+
+```python
+list_filter = ["pub_date"]
+
+search_fields = ["question_text"]
+```
+
+
+**自定义后台界面和风格**
+
+
+在你的 **`djangotutorial`** 目录中创建一个 **`templates`** 目录。
+
+设置文件（**`mysite/settings.py`**），在 [**`TEMPLATES`**](https://docs.djangoproject.com/zh-hans/5.2/ref/settings/#std-setting-TEMPLATES) 设置中添加 [**`DIRS`**](https://docs.djangoproject.com/zh-hans/5.2/ref/settings/#std-setting-TEMPLATES-DIRS) 选项：
+
+
+
+```python
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+```
+
+
+[**`DIRS`**](https://docs.djangoproject.com/zh-hans/5.2/ref/settings/#std-setting-TEMPLATES-DIRS) 是一个包含多个系统目录的文件列表，用于在载入 Django 模板时使用，是一个待搜索路径。
+
+在 **`templates`** 目录内创建一个名为 **`admin`** 的目录，并将默认的 Django 管理界面模板目录中的模板文件 **`admin/base_site.html`** 复制到该目录中。默认的 Django 管理界面模板目录位于 Django 源代码中（[django/contrib/admin/templates](https://github.com/django/django/blob/main/django/contrib/admin/templates)）。
+
+替换文件内的 **`{{ site_header|default:_('Django administration') }}`**
+
+
+```python
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></div>
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}
+```
+
+
+## debug (section-8)
+
+
+**安装 Django Debug Toolbar**
+
+
+```bash
+python -m pip install django-debug-toolbar
+```
+
+
+Django Debug Toolbar 需要进行几个设置步骤。请按照 [它的安装指南](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html) 中的步骤进行操作。安装完成后，当你浏览到 **`http://localhost:8000/admin/`** 时，你应该能够在浏览器窗口的右侧看到 DjDT 的“手柄”。点击它以打开调试工具栏，并使用每个面板中的工具。有关面板显示内容的更多信息，请参阅 [面板文档页面](https://django-debug-toolbar.readthedocs.io/en/latest/panels.html)。
+
+
+# 进阶指南：如何编写可重用程序
 
 
 # Django 模型（Models）与 ORM 操作指南
