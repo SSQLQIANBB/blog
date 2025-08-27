@@ -18,6 +18,8 @@
     2. window:  `.venv\Scripts\activate`
 8. 安装依赖：`py -m pip install Django`
 9. 停用： deactivate
+10. 导出依赖包 `pip freeze > requirement.txt`
+11. 安装依赖 `python -m pip install -r requirement.txt`
 
 ### 一台机器Django多版本管理
 
@@ -797,6 +799,58 @@ python -m pip install django-debug-toolbar
 
 
 Django Debug Toolbar 需要进行几个设置步骤。请按照 [它的安装指南](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html) 中的步骤进行操作。安装完成后，当你浏览到 **`http://localhost:8000/admin/`** 时，你应该能够在浏览器窗口的右侧看到 DjDT 的“手柄”。点击它以打开调试工具栏，并使用每个面板中的工具。有关面板显示内容的更多信息，请参阅 [面板文档页面](https://django-debug-toolbar.readthedocs.io/en/latest/panels.html)。
+
+
+## 配置环境变量
+
+
+```bash
+pip install django-environ
+```
+
+
+根目录新建 `.env`(=号左右不要有空格)
+
+
+```bash
+# DEBUG
+DEBUG=True
+
+DB_TYPE=sqlite
+
+DB_MYSQL_HOST=LOCALHOST
+
+DB_MYSQL_PORT=3306
+
+DB_MYSQL_USER=root
+
+DB_MYSQL_PASSWORD=12345678
+```
+
+
+mysite/settings.py使用
+
+
+```python
+from pathlib import Path
+import environ  // [!code ++]
+
+env = environ.Env( // [!code ++]
+    DEBUG=(bool, True), // [!code ++]
+    DB_TYPE=(str, "sqlite"), // [!code ++]
+    DB_MYSQL_HOST=(str, "LOCALHOST"), // [!code ++]
+    DB_MYSQL_PORT=(int, 3306), // [!code ++]
+    DB_MYSQL_USER=(str, "root"), // [!code ++]
+    DB_MYSQL_PASSWORD=(str, ""), // [!code ++]
+) // [!code ++]
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(Path.joinpath(BASE_DIR, ".env")) // [!code ++]
+
+DEBUG = True // [!code --]
+DEBUG = env("DEBUG") // [!code ++]
+```
 
 
 # 进阶指南：如何编写可重用程序
