@@ -774,7 +774,7 @@ TEMPLATES = [
 
 在 **`templates`** 目录内创建一个名为 **`admin`** 的目录，并将默认的 Django 管理界面模板目录中的模板文件 **`admin/base_site.html`** 复制到该目录中。默认的 Django 管理界面模板目录位于 Django 源代码中（[django/contrib/admin/templates](https://github.com/django/django/blob/main/django/contrib/admin/templates)）。
 
-替换文件内的 **`{{ site_header|default:_('Django administration') }}`**
+替换文件内的 **`site_header|default:_('Django administration')`**
 
 
 ```python
