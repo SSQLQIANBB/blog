@@ -833,23 +833,23 @@ mysite/settings.py使用
 
 ```python
 from pathlib import Path
-import environ  // [!code ++]
+import environ  # [!code ++]
 
-env = environ.Env( // [!code ++]
-    DEBUG=(bool, True), // [!code ++]
-    DB_TYPE=(str, "sqlite"), // [!code ++]
-    DB_MYSQL_HOST=(str, "LOCALHOST"), // [!code ++]
-    DB_MYSQL_PORT=(int, 3306), // [!code ++]
-    DB_MYSQL_USER=(str, "root"), // [!code ++]
-    DB_MYSQL_PASSWORD=(str, ""), // [!code ++]
-) // [!code ++]
+env = environ.Env( # [!code ++]
+    DEBUG=(bool, True), # [!code ++]#
+    DB_TYPE=(str, "sqlite"), # [!code ++]
+    DB_MYSQL_HOST=(str, "LOCALHOST"), # [!code ++]
+    DB_MYSQL_PORT=(int, 3306), # [!code ++]
+    DB_MYSQL_USER=(str, "root"), # [!code ++]
+    DB_MYSQL_PASSWORD=(str, ""), # [!code ++]
+) # [!code ++]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(Path.joinpath(BASE_DIR, ".env")) // [!code ++]
+environ.Env.read_env(Path.joinpath(BASE_DIR, ".env")) # [!code ++]
 
-DEBUG = True // [!code --]
-DEBUG = env("DEBUG") // [!code ++]
+DEBUG = True # [!code --]
+DEBUG = env("DEBUG") # [!code ++]
 ```
 
 
