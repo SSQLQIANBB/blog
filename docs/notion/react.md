@@ -1419,3 +1419,622 @@ getOptions()
   }, [roomId, serverUrl]);
 ```
 
+
+# 原理解析
+
+
+## 关键词概念
+
+1. **Fiber 节点**是最小工作单元的载体（对应组件）；
+2. **任务**是一次完整更新（如`setState`触发），包含多个 Fiber 节点的处理；
+3. **调度阶段**负责逐个处理 Fiber 节点（计算差异），因操作内存、可拆分，所以**可暂停**；
+4. **提交阶段**负责将差异应用到 DOM，因需保证 UI 一致性，所以**不可暂停**。
+
+## fiber
+
+
+React Fiber 是 React 16 引入的**新协调引擎（Reconciliation Engine）**，其核心目标是解决传统 React 渲染过程中“长时间同步任务阻塞主线程”的问题，实现渲染工作的**可中断、可恢复、优先级可控**，从而提升大型应用的响应速度和用户体验。
+
+
+### 一、Fiber 出现的背景：传统 React 渲染的痛点
+
+
+在 React 15 及之前，协调（Reconciliation，即虚拟 DOM Diff 过程）是**同步且不可中断的**：
+
+
+当组件树规模较大时，React 会从根节点开始，递归遍历整个虚拟 DOM 树，计算差异并更新真实 DOM。这个过程一旦开始，就会占用主线程直到完成（可能持续数百毫秒）。
+
+
+而浏览器的主线程不仅负责渲染，还需要处理用户输入（如点击、输入框打字）、动画帧等关键任务。如果渲染任务长时间占据主线程，会导致：
+
+- 用户操作无响应（如点击按钮没反应）；
+- 动画卡顿（掉帧）；
+- 整体体验流畅度下降。
+
+### 二、Fiber 的核心设计：把渲染拆分成“可中断的工作单元”
+
+
+Fiber 的本质是**重新设计了 React 的工作单元和调度机制**：
+
+- 将渲染工作（Diff、计算更新）拆分成一个个**小工作单元（Fiber 节点）**；
+- 每个工作单元处理完毕后，允许暂停、恢复甚至放弃（中断）；
+- 优先处理高优先级任务（如用户输入），再回头处理低优先级任务（如列表渲染）。
+
+### 1. Fiber 的数据结构：链表代替栈，支持中断与恢复
+
+
+传统 React 用“递归栈”遍历组件树（递归无法中断），而 Fiber 用**链表结构**表示工作单元，每个 Fiber 节点对应一个组件，包含以下关键信息：
+
+
+```javascript
+const fiber = {
+  type: 'div', // 组件类型（如 div、类组件、函数组件）
+  props: {}, // 组件接收的 props
+  stateNode: null, // 对应的真实 DOM 节点（若为原生组件）
+  // 链表指针（核心！用于遍历）
+  child: null, // 第一个子 Fiber 节点
+  sibling: null, // 下一个兄弟 Fiber 节点
+  return: null, // 父 Fiber 节点（完成后返回的节点）
+  // 工作状态相关
+  pendingProps: null, // 待处理的 props
+  memoizedProps: null, // 已处理的 props（用于 Diff）
+  effectTag: null, // 标记需要执行的操作（如更新、删除、新增）
+  nextEffect: null, // 下一个有副作用的 Fiber 节点
+};
+```
+
+
+**为什么用链表？**
+
+
+链表通过 `child`（子）、`sibling`（兄弟）、`return`（父）指针遍历，而非递归栈。这种结构允许遍历过程在任意节点暂停，之后通过指针继续从断点处恢复，实现“可中断”。
+
+
+### 2. 工作流程：两阶段分离（可中断 + 不可中断）
+
+
+Fiber 将渲染过程拆分为两个阶段，核心是**让耗时的“计算阶段”可中断，而“执行阶段”一次性完成**：
+
+
+### 阶段 1：调度阶段（Reconciliation / Schedule）
+
+- **作用**：遍历 Fiber 树，计算新旧节点差异，标记需要更新的节点（如 `effectTag: 'UPDATE'`）。
+- **特点**：**可中断、可恢复、优先级可控**。
+- 过程：
+    1. 从根 Fiber 开始，按“深度优先”顺序处理每个 Fiber 节点（通过链表指针遍历）；
+    2. 处理一个节点后，检查是否有更高优先级任务（如用户输入），若有则暂停当前工作，保存进度；
+    3. 当主线程空闲时，从断点恢复处理，直到所有节点处理完毕。
+
+### 阶段 2：提交阶段（Commit）
+
+- **作用**：根据调度阶段标记的“副作用”（`effectTag`），执行真实 DOM 操作（如新增、删除、更新节点）。
+- **特点**：**不可中断**（一旦开始必须完成），因为 DOM 操作需要原子性，避免页面出现不完整状态。
+- 过程：
+    1. 遍历调度阶段收集的“副作用链表”（`nextEffect`）；
+    2. 依次执行每个节点的 DOM 操作（如 `appendChild`、`removeChild`、更新属性等）；
+    3. 执行组件的生命周期方法（如 `componentDidMount`、`useEffect` 回调）。
+
+### 3. 优先级调度：谁先执行，我说了算
+
+
+Fiber 引入**优先级机制**，让不同类型的更新任务按紧急程度排序，高优先级任务可以打断低优先级任务：
+
+
+| 任务类型     | 优先级（从高到低）    | 说明                   |
+| -------- | ------------ | -------------------- |
+| 同步任务     | Immediate    | 同步执行（如 `flushSync`）  |
+| 用户输入（点击） | UserBlocking | 250ms 内需要响应，否则用户感知卡顿 |
+| 动画       | Animation    | 下一帧前必须执行，否则动画掉帧      |
+| 低优先级任务   | Low          | 可延迟（如网络请求后更新列表）      |
+| 空闲时执行    | Idle         | 浏览器空闲时才执行（最低优先级）     |
+
+
+**调度原理**：
+
+
+React 用类似 `requestIdleCallback` 的机制（内部实现了 `scheduler` 包），在浏览器每帧的空闲时间（约 16ms 帧周期内，扣除布局、绘制时间后的剩余时间）处理低优先级任务。若超过时间限制，就暂停并让出主线程。
+
+
+### 三、Fiber 带来的核心优势
+
+1. **解决主线程阻塞**：将长任务拆分为小单元，避免长时间占用主线程，保证用户输入、动画等关键操作的响应性。
+2. **支持并发模式**：Fiber 是 React 并发模式（Concurrent Mode）的基础，允许同一时间存在多个“渲染版本”（如用户输入时暂停列表渲染，输入完成后恢复）。
+3. **优先级控制**：确保紧急任务（如点击）优先执行，提升用户体验。
+
+### 四、总结
+
+
+Fiber 不是某种新的“虚拟 DOM”，而是 React 内部的**工作单元调度机制**：
+
+- 通过“链表结构”实现工作的可中断与恢复；
+- 通过“两阶段分离”让计算阶段可暂停，提交阶段原子化；
+- 通过“优先级调度”保证高紧急度任务优先执行。
+
+这些设计从根本上解决了传统 React 同步渲染的性能瓶颈，让大型 React 应用在复杂交互下仍能保持流畅。
+
+
+## react如何生成fiber及示例
+
+
+React 将任务拆分为 Fiber 节点的过程，本质是**将“组件树的更新”拆解为“逐个组件（或 DOM 元素）的更新单元”**，每个单元对应一个 Fiber 节点的处理。这个过程由 React 的“协调阶段（Reconciliation）”主导，核心是通过 `performUnitOfWork` 函数逐个处理 Fiber 节点，实现“可中断的工作拆分”。
+
+
+### 一、任务拆分的核心逻辑：从“整树更新”到“逐个 Fiber 节点处理”
+
+
+当用户触发更新（如点击按钮计算列表总和）时，React 会经历以下步骤将任务拆分：
+
+1. **触发更新**：通过 `setState` 或 `useState` 触发状态变化（如列表数据或总和状态更新）；
+2. **调度任务**：React 调度一个“更新任务”，标记需要重新渲染的根节点；
+3. **拆分任务**：从根 Fiber 开始，通过 `performUnitOfWork` 函数**逐个处理 Fiber 节点**，每个节点的处理作为一个“工作单元”；
+4. **中断与恢复**：每个工作单元处理后，检查是否需要暂停（如超时或高优先级任务），若需要则保存进度，下次恢复时从断点继续。
+
+### 二、源码层面的实现：关键函数与流程
+
+
+以下结合 React 源码（简化核心逻辑），以“点击按钮计算列表某列总和”为例，详细讲解拆分过程。
+
+
+### 场景说明
+
+
+假设有一个列表组件，点击按钮后计算所有项的 `value` 列总和，并更新显示：
+
+
+```javascript
+function ListItem({ item }) {
+  return <li>{item.name}: {item.value}</li>;
+}
+
+function SumList() {
+  const [items, setItems] = useState([{ name: 'A', value: 10 }, { name: 'B', value: 20 }]);
+  const [sum, setSum] = useState(0);
+
+  const calculateSum = () => {
+    // 点击按钮触发：计算总和并更新状态
+    const total = items.reduce((acc, item) => acc + item.value, 0);
+    setSum(total); // 触发更新
+  };
+
+  return (
+    <div>
+      <button onClick={calculateSum}>计算总和</button>
+      <p>总和: {sum}</p>
+      <ul>
+        {items.map((item, index) => (
+          <ListItem key={index} item={item} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+
+### 1. 触发更新：`setSum` 引发调度
+
+
+点击按钮后，`setSum(total)` 会触发 React 的更新机制，最终调用 `scheduleUpdateOnFiber` 函数，将更新任务加入调度队列：
+
+
+```javascript
+// 简化版：触发更新的入口
+function scheduleUpdateOnFiber(fiber) {
+  // 1. 标记 fiber 为“需要更新”
+  markUpdateLaneFromFiberToRoot(fiber);
+  // 2. 调度任务（进入协调阶段）
+  ensureRootIsScheduled(root);
+}
+```
+
+
+这里的 `fiber` 是 `SumList` 组件对应的 Fiber 节点（因 `setSum` 在该组件内调用）。
+
+
+### 2. 启动协调：`performUnitOfWork` 逐个处理 Fiber 节点
+
+
+调度器触发后，React 进入协调阶段，通过 `workLoop` 循环调用 `performUnitOfWork` 处理每个 Fiber 节点：
+
+
+```javascript
+// 工作循环：逐个处理 Fiber 节点（任务拆分的核心）
+function workLoop(shouldYield) {
+  // workInProgress 是当前正在处理的 Fiber 节点（初始为根 Fiber）
+  while (workInProgress !== null && !shouldYield()) {
+    // 处理当前 Fiber 节点，并返回下一个要处理的节点
+    workInProgress = performUnitOfWork(workInProgress);
+  }
+}
+
+// 处理单个 Fiber 节点（一个工作单元）
+function performUnitOfWork(fiber) {
+  // 1. 处理当前 Fiber 节点（计算新状态、生成子节点等）
+  const next = beginWork(fiber);
+
+  // 2. 若当前节点没有子节点，进入“完成”阶段
+  if (next === null) {
+    completeUnitOfWork(fiber);
+  } else {
+    // 3. 有子节点，下一个工作单元是子节点（深度优先遍历）
+    workInProgress = next;
+  }
+
+  // 返回下一个要处理的 Fiber 节点（可能是子节点、兄弟节点或父节点）
+  return workInProgress;
+}
+```
+
+
+### 3. 处理单个 Fiber 节点：`beginWork` 函数（核心拆分逻辑）
+
+
+`beginWork` 函数是处理单个 Fiber 节点的核心，负责：
+
+- 计算节点的新状态（如 `SumList` 组件的 `sum` 状态更新）；
+- 生成新的子 Fiber 节点（如重新渲染 `button`、`p`、`ul`、`ListItem` 等）；
+- 标记节点是否需要更新（`effectTag`）。
+
+以 `SumList` 组件的 Fiber 节点处理为例：
+
+
+```javascript
+function beginWork(current, workInProgress) {
+  const type = workInProgress.type;
+
+  switch (type) {
+    // 处理函数组件（如 SumList）
+    case FunctionComponent: {
+      // 1. 获取最新 props 和状态（sum 已更新为 30）
+      const props = workInProgress.pendingProps;
+      const state = workInProgress.memoizedState; // 包含更新后的 sum: 30
+
+      // 2. 执行组件函数，获取返回的 JSX（虚拟 DOM）
+      const children = renderWithHooks(current, workInProgress, props);
+      // children 结构：<div>...</div>（包含按钮、p、ul 等）
+
+      // 3. 将 JSX 转换为子 Fiber 节点（任务拆分的关键：拆分为子节点单元）
+      reconcileChildren(current, workInProgress, children);
+
+      // 4. 返回第一个子 Fiber 节点（下一个工作单元）
+      return workInProgress.child;
+    }
+
+    // 处理原生 DOM 元素（如 div、button、ul）
+    case HostComponent: {
+      // 1. 对比新旧 props（如 button 的 onClick 是否变化）
+      const props = workInProgress.pendingProps;
+      if (current && !shallowEqual(oldProps, props)) {
+        workInProgress.effectTag = Update; // 标记为需要更新
+      }
+
+      // 2. 生成子 Fiber 节点（如 div 的子节点是 button、p 等）
+      reconcileChildren(current, workInProgress, props.children);
+
+      // 3. 返回第一个子 Fiber 节点
+      return workInProgress.child;
+    }
+
+    // 其他类型（如文本节点、列表项等）...
+  }
+}
+```
+
+
+### 4. 子节点拆分：`reconcileChildren` 生成子 Fiber 节点
+
+
+`reconcileChildren` 函数会将组件返回的 JSX（虚拟 DOM）转换为子 Fiber 节点，实现“父任务拆分为子任务”。例如，`SumList` 组件返回的 `<div>...</div>` 会被拆分为：
+
+- `div` 对应的 Fiber 节点；
+- `div` 的子节点：`button`、`p`、`ul` 对应的 Fiber 节点；
+- `ul` 的子节点：每个 `ListItem` 组件对应的 Fiber 节点；
+- 每个 `ListItem` 的子节点：`li` 及文本节点对应的 Fiber 节点。
+
+```javascript
+// 简化版：将 JSX 转换为子 Fiber 节点
+function reconcileChildren(current, workInProgress, children) {
+  if (typeof children === 'object' && children !== null) {
+    // 遍历 JSX 子节点，逐个创建 Fiber 节点
+    let child = children;
+    let prevFiber = null;
+    while (child) {
+      // 创建子 Fiber 节点（类型、props 等）
+      const newFiber = createFiberFromElement(child);
+      // 设置链表指针（父节点、兄弟节点）
+      newFiber.return = workInProgress;
+      if (prevFiber) {
+        prevFiber.sibling = newFiber; // 兄弟节点指针
+      } else {
+        workInProgress.child = newFiber; // 第一个子节点指针
+      }
+      prevFiber = newFiber;
+      child = nextSibling(child); // 下一个 JSX 子节点
+    }
+  }
+}
+```
+
+
+### 5. 中断与恢复：`shouldYield` 控制工作单元拆分粒度
+
+
+每个 Fiber 节点处理完毕后，`workLoop` 会通过 `shouldYield` 函数判断是否需要暂停：
+
+
+```javascript
+// 判断是否需要暂停当前任务（让出主线程）
+function shouldYield() {
+  // 检查是否超时（超过当前帧剩余时间）或有高优先级任务
+  return getCurrentTime() >= frameDeadline || hasHigherPriorityWork();
+}
+```
+
+- 若 `shouldYield` 返回 `true`，`workLoop` 退出循环，任务暂停，`workInProgress` 保存当前处理到的 Fiber 节点；
+- 下次主线程空闲时，`workLoop` 从 `workInProgress` 继续处理，实现“从断点恢复”。
+
+### 三、“计算列表总和”场景的任务拆分完整流程
+
+1. **触发更新**：点击按钮调用 `calculateSum`，`setSum(30)` 触发更新，`SumList` 组件的 Fiber 节点被标记为“需要更新”。
+2. **根节点开始**：`workLoop` 从根 Fiber 节点开始，调用 `performUnitOfWork` 处理根节点，最终进入 `SumList` 组件的 Fiber 节点处理。
+3. **处理** **`SumList`** **组件**：
+    - `beginWork` 执行 `SumList` 函数，获取更新后的 `sum: 30`，生成包含 `button`、`p`、`ul` 的 JSX。
+    - `reconcileChildren` 将 JSX 拆分为 `div`、`button`、`p`、`ul` 对应的子 Fiber 节点。
+    - 返回第一个子节点（`div` 的 Fiber 节点）作为下一个工作单元。
+4. **处理** **`div`** **节点**：
+    - 对比新旧 props，生成 `button`、`p`、`ul` 的子 Fiber 节点，返回 `button` 节点作为下一个单元。
+5. **处理** **`button`** **节点**：
+    - 检查 `onClick` 未变化，无更新，返回 `p` 节点（兄弟节点）作为下一个单元。
+6. **处理** **`p`** **节点**：
+    - 内容从“总和: 0”变为“总和: 30”，标记 `effectTag: Update`，返回 `ul` 节点（兄弟节点）。
+7. **处理** **`ul`** **节点**：
+    - 生成 `ListItem` 组件的子 Fiber 节点，返回第一个 `ListItem` 节点。
+8. **处理** **`ListItem`** **组件**：
+    - 执行组件函数，生成 `li` 节点，返回 `li` 作为下一个单元。
+9. **依次处理所有节点**：直到所有 Fiber 节点处理完毕，进入提交阶段（更新 DOM）。
+
+### 四、核心结论
+
+
+React 将任务拆分为 Fiber 节点的本质是：
+
+- 以“组件/ DOM 元素”为单位，通过 `performUnitOfWork` 逐个处理 Fiber 节点；
+- 每个节点的处理（`beginWork`）包含“计算状态、生成子节点”，作为一个独立的工作单元；
+- 通过 `workLoop` 循环和 `shouldYield` 控制，实现“处理一个单元→检查是否暂停→继续下一个单元”的拆分逻辑。
+
+这种设计让原本可能耗时较长的“整树更新”任务，被拆分为多个毫秒级的小单元，从而支持中断与恢复，避免阻塞主线程。
+
+
+## React 更新流程：
+
+
+**触发更新 → 构建 workInProgress Fiber 树（边构建边 diff） → 生成 effect list → commit 执行真实 DOM 更新**
+
+
+## React是单个dom更新还是批量更新dom的呢？
+
+
+### **一、React 的 DOM 更新分 “两步”**
+
+
+React 操作 DOM 并非 “执行到 Fiber 就立即更 DOM”，而是严格分为 **“协调（Reconciliation）”** 和 **“提交（Commit）”** 两个阶段，这是理解 “批量更新” 的基础：
+
+
+| **阶段**               | **核心工作**                                                                               | **是否操作 DOM** | **能否被中断（暂停 / 恢复）**    |
+| -------------------- | -------------------------------------------------------------------------------------- | ------------ | --------------------- |
+| 协调阶段（Reconciliation） | 1. 遍历 Fiber 树，对比新旧 Fiber 节点（Diff 算法）2. 标记需要更新的 Fiber（打 “副作用标记”，如 `Update`/`Placement`） | 否            | 是（依赖 Scheduler 调度）    |
+| 提交阶段（Commit）         | 1. 遍历带有 “副作用标记” 的 Fiber 节点2. 一次性执行所有 DOM 操作（更新 / 新增 / 删除）3. 执行 `useEffect` 等副作用        | 是            | 否（必须一次性完成，避免 DOM 不一致） |
+
+
+### **二、核心结论：React 是 “按标记批量更新 DOM”，而非 “单个 Fiber 即时更新”**
+
+
+React 不会在 “协调阶段” 遍历到一个 “需要更新的 Fiber” 就立即改 DOM（否则会频繁触发浏览器重排重绘，性能极差），而是先在协调阶段给所有需要更新的 Fiber 打上 “标记”，等 **所有协调工作完成后，在 “提交阶段” 一次性批量处理这些标记对应的 DOM 操作**。
+
+
+用户操作（如点击按钮）→ 修改 state → 进入【协调阶段】
+│
+├─ 1. 创建 Root Fiber → 遍历 Fiber 树
+├─ 2. 对比新旧 Fiber → 给需要更新的 Fiber 打标记（如 Update）
+├─ 3. 协调阶段结束（无 DOM 操作）
+│
+↓ 进入【提交阶段】
+├─ 1. 遍历带标记的 Fiber 节点
+├─ 2. 一次性执行所有标记对应的 DOM 操作
+└─ 3. 提交阶段结束（DOM 更新完成）
+
+
+### 整体流程
+
+
+```plain text
+用户点击按钮（触发 setTotal）
+        ↓
+Scheduler 调度：将更新任务放入队列，等待浏览器空闲
+        ↓
+【协调阶段（可中断）】
+        ↓
+1. 从根 Fiber 开始，遍历生成新 Fiber 树（包括列表、总和组件）
+        ↓
+2. Diff 对比新旧 Fiber：标记“总和组件 Fiber”为 Update，列表项 Fiber 可复用
+        ↓
+3. 若浏览器有高优先级任务（如输入）→ 暂停，保存遍历位置；空闲后恢复
+        ↓
+协调阶段完成：收集所有“待更新 Fiber 节点”
+        ↓
+【提交阶段（不可中断）】
+        ↓
+1. 遍历“待更新 Fiber 列表”（仅总和组件 Fiber）
+        ↓
+2. 一次性执行 DOM 操作：修改总和组件的 innerText
+        ↓
+3. 执行副作用（如 useEffect）
+        ↓
+DOM 更新完成，页面显示新总和
+```
+
+
+### 协调阶段
+
+
+```plain text
+开始协调：从根 Fiber → 列表组件 Fiber → 列表项 Fiber 1...
+        ↓
+正在处理“总和组件 Fiber”的 Diff → 浏览器触发用户输入（高优先级任务）
+        ↓
+React 暂停协调：保存当前位置（总和组件 Fiber），释放 JS 线程
+        ↓
+浏览器处理用户输入 → 输入完成，浏览器空闲
+        ↓
+React 恢复协调：从“总和组件 Fiber”继续，完成 Diff 并标记 Update
+        ↓
+继续遍历剩余 Fiber（如列表项 Fiber n）→ 协调阶段结束
+```
+
+
+### 提交阶段
+
+
+```plain text
+提交阶段开始：拿到“待更新 Fiber 列表”（仅总和组件 Fiber）
+        ↓
+遍历待更新列表：找到总和组件 Fiber 对应的 DOM 节点（<span class="total">...</span>）
+        ↓
+一次性执行 DOM 操作：node.innerText = newTotal（无其他 DOM 操作）
+        ↓
+若有其他待更新 Fiber（如某列表项样式）→ 一并执行 DOM 修改（如 node.style.color = 'red'）
+        ↓
+所有 DOM 操作执行完毕 → 触发浏览器一次重排重绘
+        ↓
+提交阶段结束
+```
+
+
+## fiber调度
+
+
+### 一、React 16/17 为何弃用 `requestAnimationFrame`？
+
+
+React 16/17 中，调度器依赖 `requestAnimationFrame` 计算“帧截止时间”（`frameDeadline = timestamp + 16ms`），但这种方案存在两个关键缺陷：
+
+1. **帧对齐延迟**：`requestAnimationFrame` 的回调会在“浏览器每帧渲染前”触发（约 16ms 一次），若任务优先级极高（如用户输入），需等待下一个帧回调才能执行，可能导致 16ms 级别的延迟（对输入响应来说感知明显）。
+2. **主线程阻塞风险**：若当前帧渲染任务（如复杂动画）耗时超过 16ms，`requestAnimationFrame` 回调会被延迟，进而导致调度器无法及时触发任务，影响响应性。
+
+为解决这些问题，React 18 改用 `MessageChannel` 作为“微任务级”的调度触发器，配合 `setTimeout` 兜底，实现更精细的任务调度。
+
+
+### 二、React 18 调度核心：`MessageChannel + setTimeout` 原理
+
+
+`MessageChannel` 是浏览器提供的 API，用于创建两个相互通信的端口（`port1`/`port2`），通过 `postMessage` 发送消息，消息回调会在“微任务队列清空后、下一次宏任务执行前”触发（优先级高于 `setTimeout`）。React 18 利用这一特性，实现“低延迟、可中断”的任务调度。
+
+
+### 1. 核心机制：`MessageChannel` 作为任务触发器
+
+
+React 18 调度器会创建一个全局 `MessageChannel`，并将任务执行逻辑绑定到 `port2` 的 `onmessage` 回调：
+
+
+```javascript
+// React 18 Scheduler 核心伪代码
+const channel = new MessageChannel();
+const port = channel.port2;
+
+// 任务队列（按优先级排序）
+let taskQueue = [];
+// 是否正在等待消息（避免重复触发）
+let isPostMessageScheduled = false;
+
+// 1. 调度任务：将任务加入队列，并触发 MessageChannel
+function scheduleTask(task) {
+  taskQueue.push(task); // 任务入队（按优先级排序）
+  if (!isPostMessageScheduled) {
+    isPostMessageScheduled = true;
+    // 发送消息，触发 port2.onmessage 回调（微任务后执行）
+    channel.port1.postMessage(null);
+  }
+}
+
+// 2. 消息回调：执行任务队列
+port.onmessage = function () {
+  isPostMessageScheduled = false;
+  // 执行任务（可中断逻辑）
+  workLoop();
+};
+```
+
+- **触发时机**：`port1.postMessage(null)` 发送消息后，`port2.onmessage` 回调会在“当前宏任务内的微任务全部执行完毕后”立即触发（比 `setTimeout(fn, 0)` 快，`setTimeout` 会延迟到下一个宏任务）。
+- **优势**：避免 `requestAnimationFrame` 的 16ms 帧延迟，高优先级任务（如用户输入）能更快进入执行流程。
+
+### 2. `setTimeout` 作为降级兜底方案
+
+
+`MessageChannel` 在大部分现代浏览器中支持良好，但存在极少数特殊场景（如旧版 IE 不支持 `MessageChannel`，或某些 iframe 环境中 `MessageChannel` 被限制）。此时，React 18 会降级使用 `setTimeout` 触发任务：
+
+
+```javascript
+// 降级逻辑伪代码
+function scheduleTaskFallback(task) {
+  taskQueue.push(task);
+  if (!isTimeoutScheduled) {
+    isTimeoutScheduled = true;
+    // 使用 setTimeout 触发任务（下一个宏任务执行）
+    setTimeout(() => {
+      isTimeoutScheduled = false;
+      workLoop();
+    }, 0);
+  }
+}
+```
+
+- **作用**：保证调度器在所有环境下的兼容性，避免因 API 不支持导致任务无法执行。
+
+### 3. 任务执行：`workLoop` 与可中断逻辑不变
+
+
+无论是 `MessageChannel` 还是 `setTimeout` 触发，最终都会进入 `workLoop` 执行任务，且“可中断”核心逻辑与 React 16/17 一致：
+
+
+```javascript
+function workLoop() {
+  let currentTask = taskQueue.shift(); // 取出最高优先级任务
+  while (currentTask) {
+    // 执行任务单元（如处理一个 Fiber 节点）
+    const didComplete = currentTask.execute();
+    if (!didComplete) {
+      // 任务未完成（如超时），重新入队，等待下次调度
+      taskQueue.unshift(currentTask);
+      break;
+    }
+    currentTask = taskQueue.shift();
+  }
+}
+```
+
+- **可中断关键**：每个任务单元执行后，会检查是否超时（超过当前任务的优先级过期时间）或有更高优先级任务入队，若满足则暂停任务，下次调度时恢复。
+
+### 三、`MessageChannel` 对比 `requestAnimationFrame`：核心优势
+
+
+| 特性      | React 16/17（requestAnimationFrame） | React 18（MessageChannel） |
+| ------- | ---------------------------------- | ------------------------ |
+| 触发频率    | 固定 16ms/次（与帧同步）                    | 按需触发（微任务后立即执行）           |
+| 高优任务延迟  | 可能延迟 16ms（需等下一个帧）                  | 微任务级延迟（≈0ms）             |
+| 适用场景    | 低优先级渲染任务（如列表滚动）                    | 高优交互任务（如输入、点击）+ 并发渲染     |
+| 主线程阻塞影响 | 受帧渲染耗时影响大                          | 受影响小（微任务优先级高）            |
+
+
+### 四、为何配合 `setTimeout` 而非单独使用 `MessageChannel`？
+
+1. **兼容性兜底**：如前所述，`MessageChannel` 并非所有环境都支持（如 IE 11 及以下），`setTimeout` 是浏览器通用 API，确保调度器在极端环境下可用。
+2. **避免“无限循环”风险**：若任务执行过程中不断产生新任务，`MessageChannel` 的 `onmessage` 会被频繁触发，可能导致主线程长时间忙碌。`setTimeout` 会将任务延迟到下一个宏任务，给主线程喘息机会（尽管 React 18 有优先级控制，但若出现异常，`setTimeout` 可作为安全屏障）。
+
+### 调度机制核心变化
+
+- **核心触发器**：从 `requestAnimationFrame` 改为 `MessageChannel`，解决高优任务的帧延迟问题，适配并发渲染的低延迟需求。
+- **降级方案**：保留 `setTimeout` 作为兜底，确保跨环境兼容性。
+- **可中断逻辑**：`workLoop` 与 Fiber 任务拆分逻辑不变，仍通过“任务单元+优先级过期时间”实现可中断、可恢复。
+
+这一调整让 React 18 在处理“用户输入+并发渲染”场景时响应更快（如输入框打字无卡顿、复杂列表滚动时点击操作即时响应）。
+
