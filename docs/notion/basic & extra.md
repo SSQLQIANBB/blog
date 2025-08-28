@@ -505,3 +505,289 @@ console.log(Polygon.count); // 3
     - `Content-Disposition: filename=“文件名.png”`
     - `<a download="文件名.png"></a>`
     - `url最后一节 http://localhost:8087/upload/文件名.png`
+
+## AST示例
+
+
+```javascript
+const a = 100;
+
+const a1 = 300
+
+function format(date) {
+	return dayjs(date).format('YYYY-MM-DD')
+}
+
+const arrowFoo = () => {
+	const b = a + a1;
+  
+  	return b
+}
+
+import dayjs from 'day.js'
+```
+
+
+### 一、AST 整体结构解析（从顶层到核心）
+
+
+整个 JSON 的顶层是 `File` 节点，代表整个 JS 文件；核心是 `program` 节点（对应 JavaScript 的“程序”概念），包含代码的所有语句和配置。
+
+
+| 顶层节点           | 作用                                      |
+| -------------- | --------------------------------------- |
+| `type: "File"` | AST 根节点，代表整个 JS 文件。                     |
+| `errors: []`   | 记录代码解析过程中的语法错误（空数组表示代码无语法错误）。           |
+| `program`      | 核心节点，代表 JavaScript 程序本身，包含代码的执行环境和所有语句。 |
+| `comments: []` | 记录代码中的注释（空数组表示代码无注释）。                   |
+
+
+### 核心 `program` 节点详解
+
+
+`program` 是 AST 的“心脏”，关键属性：
+
+- `sourceType: "module"`：表示当前文件是 **ES 模块（ESM）**（支持 `import`/`export`），而非普通脚本（`sourceType: "script"`）。
+- `body: [...]`：数组形式，存储文件中的所有 **语句**（如变量声明、函数声明、导入语句等），每个元素对应一个独立的代码语句。
+- `loc`：记录整个程序的位置信息（`line` 行号、`column` 列号、`index` 字符索引），用于定位代码在文件中的位置（调试或报错时用）。
+
+### 二、`program.body` 语句解析（对应原始 JS 代码）
+
+
+`program.body` 中的每个元素都是一个“语句节点”，我们逐个拆解，并还原出对应的原始 JS 代码：
+
+
+### 1. 第一个语句：`const a = 100`（变量声明）
+
+
+对应 `body[0]`，类型是 `VariableDeclaration`（变量声明语句）：
+
+
+```json
+{
+  "type": "VariableDeclaration",
+  "kind": "const", // 声明类型：const（还可能是 let/var）
+  "declarations": [ // 声明的变量列表（这里只有一个变量 a）
+    {
+      "type": "VariableDeclarator", // 单个变量声明
+      "id": { "type": "Identifier", "name": "a" }, // 变量名：a（Identifier 表示“标识符”）
+      "init": { // 变量初始值：100
+        "type": "NumericLiteral", // 数字字面量（对应 JS 中的数字）
+        "value": 100,
+        "extra": { "raw": "100", "rawValue": 100 } // 原始代码中的写法（如 100 而非 1e2）
+      }
+    }
+  ],
+  "loc": { "start": { "line": 1 } } // 代码在第 1 行
+}
+```
+
+
+**原始代码**：`const a = 100;`
+
+
+### 2. 第二个语句：`const a1 = 300`（变量声明）
+
+
+对应 `body[1]`，结构和第一个完全一致，只是变量名和值不同：
+
+- 变量名：`a1`（`id.name: "a1"`）
+- 初始值：`300`（`init.value: 300`）
+- 位置：第 3 行（`loc.start.line: 3`）
+
+**原始代码**：`const a1 = 300;`
+
+
+### 3. 第三个语句：`function format(date) { return dayjs(date).format('YYYY-MM-DD') }`（函数声明）
+
+
+对应 `body[2]`，类型是 `FunctionDeclaration`（函数声明语句）：
+
+
+```json
+{
+  "type": "FunctionDeclaration",
+  "id": { "type": "Identifier", "name": "format" }, // 函数名：format
+  "params": [ // 函数参数列表（只有一个参数 date）
+    { "type": "Identifier", "name": "date" }
+  ],
+  "body": { // 函数体（用 {} 包裹的代码块，类型是 BlockStatement）
+    "type": "BlockStatement",
+    "body": [ // 函数体中的语句（这里是 return 语句）
+      {
+        "type": "ReturnStatement", // return 语句
+        "argument": { // return 的返回值：dayjs(date).format('YYYY-MM-DD')
+          "type": "CallExpression", // 函数调用表达式（format 方法调用）
+          "callee": { // 被调用的函数：dayjs(date).format
+            "type": "MemberExpression", // 成员表达式（obj.prop 形式）
+            "object": { // 成员表达式的对象：dayjs(date)
+              "type": "CallExpression", // 函数调用（dayjs 调用）
+              "callee": { "type": "Identifier", "name": "dayjs" }, // 函数名 dayjs
+              "arguments": [ { "type": "Identifier", "name": "date" } ] // 参数 date
+            },
+            "property": { "type": "Identifier", "name": "format" } // 成员属性 format
+          },
+          "arguments": [ // format 方法的参数：'YYYY-MM-DD'
+            {
+              "type": "StringLiteral", // 字符串字面量
+              "value": "YYYY-MM-DD",
+              "extra": { "raw": "'YYYY-MM-DD'", "rawValue": "YYYY-MM-DD" }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "loc": { "start": { "line": 5 } } // 第 5 行
+}
+```
+
+
+**原始代码**：
+
+
+```javascript
+function format(date) {
+  return dayjs(date).format('YYYY-MM-DD');
+}
+```
+
+
+### 4. 第四个语句：`const arrowFoo = () => { const b = a + a1; return b }`（箭头函数声明）
+
+
+对应 `body[3]`，类型是 `VariableDeclaration`（变量声明），变量值是箭头函数：
+
+
+```json
+{
+  "type": "VariableDeclaration",
+  "kind": "const",
+  "declarations": [
+    {
+      "id": { "type": "Identifier", "name": "arrowFoo" }, // 变量名：arrowFoo
+      "init": { // 初始值：箭头函数
+        "type": "ArrowFunctionExpression", // 箭头函数表达式
+        "params": [], // 无参数（() 形式）
+        "body": { // 函数体（代码块）
+          "type": "BlockStatement",
+          "body": [
+            // 第一个语句：const b = a + a1
+            {
+              "type": "VariableDeclaration",
+              "kind": "const",
+              "declarations": [
+                {
+                  "id": { "name": "b" },
+                  "init": { // a + a1（二元表达式）
+                    "type": "BinaryExpression", // 二元运算（+ 操作）
+                    "left": { "name": "a" }, // 左操作数：a
+                    "operator": "+", // 运算符：+
+                    "right": { "name": "a1" } // 右操作数：a1
+                  }
+                }
+              ]
+            },
+            // 第二个语句：return b
+            {
+              "type": "ReturnStatement",
+              "argument": { "type": "Identifier", "name": "b" }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "loc": { "start": { "line": 9 } } // 第 9 行
+}
+```
+
+
+**原始代码**：
+
+
+```javascript
+const arrowFoo = () => {
+  const b = a + a1;
+  return b;
+};
+```
+
+
+### 5. 第五个语句：`import dayjs from 'day.js'`（ES 模块导入）
+
+
+对应 `body[4]`，类型是 `ImportDeclaration`（导入语句）：
+
+
+```json
+{
+  "type": "ImportDeclaration",
+  "specifiers": [ // 导入的标识符（这里是默认导入）
+    {
+      "type": "ImportDefaultSpecifier", // 默认导入（import xxx from ...）
+      "local": { "type": "Identifier", "name": "dayjs" } // 本地变量名：dayjs
+    }
+  ],
+  "source": { // 导入的模块路径
+    "type": "StringLiteral",
+    "value": "day.js", // 模块路径：'day.js'
+    "extra": { "raw": "'day.js'", "rawValue": "day.js" }
+  },
+  "loc": { "start": { "line": 15 } } // 第 15 行
+}
+```
+
+
+**原始代码**：`import dayjs from 'day.js';`
+
+
+### 三、AST 的关键意义与应用场景
+
+
+AST 本身不直接“运行代码”，但所有处理 JS 代码的工具都依赖它：
+
+1. **代码检查（如 ESLint）**：遍历 AST 检查语法规范（如是否使用 `var`、函数名是否符合驼峰式）。
+2. **代码转译（如 Babel）**：将 ES6+ 的 AST 转换为 ES5 的 AST，再生成兼容代码（如箭头函数转普通函数）。
+3. **代码格式化（如 Prettier）**：分析 AST 结构，按规则重新排版代码（如缩进、换行）。
+4. **代码压缩（如 Terser）**：通过 AST 移除无用代码、缩短变量名（如 `a1` 缩为 `b`）。
+
+### 四、注意点：AST 中的“位置信息”（`loc`）
+
+
+每个节点的 `loc` 属性（`line` 行号、`column` 列号、`index` 字符索引）非常重要：
+
+- 工具报错时定位问题（如 ESLint 提示“第 5 行第 10 列有未使用的变量”）；
+- 代码调试时关联 AST 节点与原始代码。
+
+### 总结
+
+
+这段 JSON 是对一段 ES 模块 JS 代码的 AST 描述，完整还原了原始代码的结构：
+
+
+```javascript
+// 第 1 行
+const a = 100;
+
+// 第 3 行
+const a1 = 300;
+
+// 第 5 行
+function format(date) {
+  return dayjs(date).format('YYYY-MM-DD');
+}
+
+// 第 9 行
+const arrowFoo = () => {
+  const b = a + a1;
+  return b;
+};
+
+// 第 15 行
+import dayjs from 'day.js';
+```
+
+
+（注：原始代码中 `import` 语句在最后一行，不符合 ES 模块“`import` 需在代码顶部”的规范，但 AST 仅记录代码结构，不判断逻辑合理性，所以 `errors` 仍为空。）
+
