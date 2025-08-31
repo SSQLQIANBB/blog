@@ -1,0 +1,95 @@
+import{_ as p,c as e,o as a,a as i}from"./app.CSbnZnrO.js";const n="/blog/assets/2402e27caab40e774f468d94a320f063.DoNZZ5BT.png",k=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"notion/前端面试.md","filePath":"notion/前端面试.md","lastUpdated":1756379655000}'),s={name:"notion/前端面试.md"};function l(r,t,o,d,h,c){return a(),e("div",null,t[0]||(t[0]=[i(`<ol><li>try catch可以捕获异步代码中的错误吗</li><li>var o = { a: 1 }; var O2 = o; o = 1; O2 等于什么</li><li>promise实例方法，以及常用静态方法</li><li><strong>0.1+0.2等于0.3吗（精度丢失）</strong></li><li>冒泡和捕获执行顺序 addeventListener参数以及第三个参数, <ol><li>分别设置(捕获)true 和（冒泡） false 以及e.target和e.currentTarget输出顺序</li></ol></li><li><strong>click和blur事件</strong></li><li>vue2.0不能检查数组哪些变化，该怎么解决</li><li>讲讲对keep-alive的理解以及<code>include</code> 、<code>exclude、max</code> 生命周期</li><li>组件通信</li><li>浏览器缓存机制 状态码304为何 <strong>Expires</strong> <strong>Cache-Control</strong> <strong>Last-Modified / If-Modified-Since Etag / If-None-Match</strong></li><li>父子组件生命周期</li><li><strong>methods,watch,computed的区别</strong></li><li>promise.all .race</li></ol><p>面试情况：</p><ol><li>发布订阅模式和观察者模式概念不清晰</li><li>业务理解不够深刻，项目描述不够清晰</li><li>浅拷贝、深拷贝了解不够深刻</li><li>事件循环</li><li>promise了解不够全面</li><li>es6 map weakmap</li><li>typeof instanceof</li><li>css 基础 脱离文档流和BFC概念不清晰</li><li>…</li></ol><p>sider ❌ → sideBar</p><table tabindex="0"><thead><tr><th>姓名</th><th>工作年限</th><th>薪资</th><th>能力</th><th>毕业院校</th></tr></thead><tbody><tr><td>苏君</td><td>5.5</td><td>20</td><td>微前端、vue、react、前端工程化；没有vue3项目经历</td><td>安徽工业大学工商学院</td></tr><tr><td>刘际生</td><td>9</td><td>27</td><td>专精js、深入掌握常用框架</td><td>天津理工学院</td></tr><tr><td>陈赛</td><td>6.5</td><td>29</td><td>微前端、vue3\\vue2 、react技术栈较全面，项目经历丰富，low-code项目经验</td><td>郑州大学</td></tr><tr><td>刘鹏</td><td>9</td><td>22</td><td>react、vue2、vue3</td><td>邵阳学院</td></tr><tr><td>董荣兴</td><td>8</td><td>25</td><td>vue2\\react,没有vue3项目经历，low-code项目经验</td><td>河北农业大学</td></tr><tr><td>周旭</td><td>9</td><td>30</td><td>暂时没有vue3项目经验</td><td>郑州升达经贸学院</td></tr><tr><td>袁兵</td><td>8</td><td>28</td><td>暂时没有vue3项目经验</td><td></td></tr><tr><td>杨涛</td><td>10</td><td>18</td><td>新知识接受很强，低代码，vue</td><td>宁波工程学院</td></tr><tr><td>谢太东</td><td>9</td><td>25</td><td>精通java，js</td><td>华侨大学</td></tr></tbody></table><p>预选人（顺序）：苏君、刘际生、陈赛、刘鹏、董荣兴</p><p>郑安娜：</p><p>项目难点，技术难点</p><pre><code>json不可写
+
+
+跨域策略调整
+</code></pre><p>防抖、非缓存计算属性和用户确认弹窗在内的多个<strong>装饰器</strong></p><p>单元测试 jest, 目标代码需要操作dom —</p><p><strong>CICD</strong></p><p><strong>贺文春：</strong></p><p><strong>代码洁癖，代码规范，对技术感兴趣</strong></p><p><strong>项目全部vue2,</strong></p><p><strong>深拷贝封装</strong></p><p><strong>防抖和节流</strong></p><p><strong>权限控制（菜单、按钮、数据权限）</strong></p><p><strong>v-if v-for一起使用</strong></p><p><strong>深、浅拷贝基本掌握</strong></p><p><strong>事件循环：概念背诵，但是理解不深刻</strong></p><p><strong>promise理解一般</strong></p><p><strong>李园园</strong></p><p>大数据优化，数据分批处理</p><p>熟悉vue源码——</p><p>动画加载优化</p><p>低代码平台</p><p>即时通讯websocket</p><p>微前端理解qiankun</p><p>组件封装</p><p>主题切换</p><p>类型判断</p><p>事件循环</p><p>promise vue组件通讯 双向绑定原理</p><p>vue3 一年</p><p>ts较少</p><p>webpack、vite</p><p><strong>李园园</strong></p><p>表达能力较好，性格比较开朗，思路和逻辑比较清晰，技术相对符合（vue3使用一年，ts使用时间较短），vue源码理解较薄弱</p><p>期望薪资16-17</p><p>tailwind使用. apply</p><p>组件库、代码规范提交规范、eslint、prettier、stylelint、commitlint、</p><p>分支管理-主分支</p><p>组件文档： word;</p><p>开放协议：商用、不可商用</p><p>通用方案总结</p><p>主题切换</p><p>实时通讯功能</p><p>首页拖拽低代码</p><p>权限控制：RBAC,ACL,ABAC</p><h2 id="面试安排" tabindex="-1">面试安排 <a class="header-anchor" href="#面试安排" aria-label="Permalink to &quot;面试安排&quot;">​</a></h2><p>06.06 15:00-16:00 海康威视</p><p>vue2转vue3</p><p>工程化</p><p>pnpm</p><p>async await实现</p><p>webpack</p><p>vite</p><p>rollup</p><p>微前端</p><p>vue</p><p>js</p><p>ts</p><p>性能优化</p><h2 id="面试整理" tabindex="-1">面试整理 <a class="header-anchor" href="#面试整理" aria-label="Permalink to &quot;面试整理&quot;">​</a></h2><p>浏览器离线缓存 Npm pnpm yarn 区别以及对依赖冲突的解决办法 Cookie的samesite userAgent Es6 es6+ babel Lerna History hash 区别 Diff算法 key作用 Vue3 vue2区别 Es6+生成器 深度优先广度优先BFS DFS 跨站攻击 浏览器内核 Don渲染优化 移动端自适应 跨域 前端渲染优化 浏览器内核 web安全 Computed缓存实现原理</p><h3 id="_1" tabindex="-1">1. <a class="header-anchor" href="#_1" aria-label="Permalink to &quot;1.&quot;">​</a></h3><p>overflow: hidden 重绘</p><p>display: none 不占位 回流</p><p>visibility: none 继承, 占位 重绘 子元素设置visible可显示</p><p>opacity: 0 占位 加transform 不重绘 , 继承,子元素设置opacity不显示</p><h3 id="_2" tabindex="-1">2. <a class="header-anchor" href="#_2" aria-label="Permalink to &quot;2.&quot;">​</a></h3><p>position: absolute fixed脱离文档流 不占位</p><p>float: left 脱离文档流 占位 块级元素改变 导致BFC</p><p>BFC: 开辟独立空间, 使空间内子元素不会影响外面布局</p><ul><li>overflow: hidden</li><li>display: inline-block</li><li>position: absolute</li><li>position: fixed</li><li>display: table-cell</li><li>display: flex</li></ul><ol><li>float: left 父盒子高度塌陷,父节点使用display: inline-block等可以解决</li><li>margin重叠 标签嵌套父元素</li></ol><h3 id="_3" tabindex="-1">3. <a class="header-anchor" href="#_3" aria-label="Permalink to &quot;3.&quot;">​</a></h3><p>作用域链</p><p>作用域: 全局作用域\\ 函数作用域\\ 块级作用域</p><p>取自由变量的值时 <strong>要到创建这个函数的那个域</strong></p><h3 id="_4" tabindex="-1">4. <a class="header-anchor" href="#_4" aria-label="Permalink to &quot;4.&quot;">​</a></h3><p>我们知道JavaScript属于解释型语言，JavaScript的执行分为：解释和执行两个阶段,这两个阶段所做的事并不一样：</p><h3 id="解释阶段" tabindex="-1">解释阶段： <a class="header-anchor" href="#解释阶段" aria-label="Permalink to &quot;解释阶段：&quot;">​</a></h3><ul><li>词法分析</li><li>语法分析</li><li>作用域规则确定</li></ul><h3 id="执行阶段" tabindex="-1">执行阶段： <a class="header-anchor" href="#执行阶段" aria-label="Permalink to &quot;执行阶段：&quot;">​</a></h3><ul><li>创建执行上下文</li><li>执行函数代码</li><li>垃圾回收</li></ul><h3 id="pwa" tabindex="-1">PWA <a class="header-anchor" href="#pwa" aria-label="Permalink to &quot;PWA&quot;">​</a></h3><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Progressive_web_apps" target="_blank" rel="noreferrer">https://developer.mozilla.org/zh-CN/docs/Web/Progressive_web_apps</a></p><h3 id="vue-ssr" tabindex="-1">vue SSR <a class="header-anchor" href="#vue-ssr" aria-label="Permalink to &quot;vue SSR&quot;">​</a></h3><h3 id="webpack-缓存" tabindex="-1">webpack 缓存 <a class="header-anchor" href="#webpack-缓存" aria-label="Permalink to &quot;webpack 缓存&quot;">​</a></h3><p>workbox-webpack-plugin</p><p>service woker</p><p>manifest</p><h3 id="数组操作" tabindex="-1">数组操作 <a class="header-anchor" href="#数组操作" aria-label="Permalink to &quot;数组操作&quot;">​</a></h3><p>BFS DFS Grid 布局 前端性能优化 V-if v-html原理</p><p>Arguments使用 Reduce While循环 Vuex Router 手写async</p><p>9:00 - 11:00上午刷面试题 1:30 - 5:30 下午修改简历</p><p>8:30 - 10:00 晚上学习node+react</p><p>如何强制缓存</p><p>语义化标签 标准盒模型 Float清除浮动 Meta标签 盒子居中 数据类型 Some every 屏幕适配 打断promise执行 高阶函数</p><p>判断类型 虚拟dom Vue.sync等修饰符 NextTick作用 抖动和节流 混淆 Keep-alive原理 Map和forEach改变数组 Computed和watch 父子组件生命周期 Bus原理 盒子模型 空标签 Map和weakMap 浏览器缓存机制 Promise衍生方法 深拷贝和浅拷贝 For in 可以遍历原型方法吗 冒泡排序方法 Get post请求区别 Options请求为何 状态码304为何 盒子居中 Diff算法 New对象做了什么 History和hash路由 Vue中路由如何进行匹配更新组件的 Web worker 防抖和节流 设计模式 订阅发布者模式工厂模式 socket连接数量限制</p><p>工作氛围，技术框架， Webpack打包越多越好还是越少越好 事件循环 按需引入，动态组件 Vuex action如何触发 dispatch原理 子组件和父组件执行生命周期 混入执行的生命周期</p><p>浏览器缓存机制 执行上下文 垃圾回收机制 变量提升 For of循环原理 Xss攻击 Csrf攻击 Cors跨域 简单请求和预检请求 Diff算法 Vue router原理 Const对象</p><p>什么时候是any\\never\\unknown</p><p>浏览器同源策略 Proxy到底有什么好处 原生ajax</p><p>作用域，块级作用域 http Http管线化，可以同时进行多个http请求 Tcp三次握手和四次挥手之间进行http请求 Http1.1和http2.0区别 跨域 图片预加载 cookie sessionStorage区别 webpack打包 大屏和项目自适应配置 原型和原型链</p><p>Arguments使用 Reduce While循环 Vuex Router</p><p>垃圾回收</p><p>Async defer</p><p>v8引擎对大型数组的存储 字典模式和快速模式</p><p>padstart mutationObserve</p><p>基于图论的流程节点 入度出度</p><p>沙盒环境如何实现 如何在沙盒中限制不能获取dom iframe隔绝 数据上报 性能优化</p><p>难点 动态表单循环依赖，生命周期执行异步任务</p><p>解决过的性能优化问题 浏览器卡顿和内存之间的关系，为什么内存高页面会卡 计算和运行时内存的关系 即运行时的存储和计算的关系 线程，栈溢出为什么会浏览器卡顿 浏览器崩溃和卡顿的原因 内存溢出 数组扩容计算，占用主线程 浏览器两个线程 渲染线程 计算线程 渲染线程被计算线程打断阻碍，造成肉眼看这跳帧 渲染一帧计算阻碍直接跳到十几帧，造成肉眼可见的跳帧 requestframeanimation 浏览器内存多大会爆栈 栈溢出 cpu分给浏览器多大的运行内存，cpu内存分配</p><p>白屏问题</p><p>Rrovide inject如何实现 Uniapp转多端原理 this指向constructor函数里面的this Promise.all实现原理 闭包 函数式编程和面向对象编程 Es6和commonjs Treeshaking Webpack打包原理</p><p>Css模块化</p><p>js执行原理</p><p>作用域、作用域链</p><p><strong>作用域链在解析时生成</strong></p><p><strong>函数每次调用时，会创建新的局部作用域</strong></p><p>闭包</p><p>块级作用域</p><p>variable object / global object / function object存放函数编译后的代码（函数名、函数长度、作用域链等信息）</p><p>函数是最早被声明的（提前于变量）</p><div class="language-typescript vp-adaptive-theme line-numbers-mode"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">var</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> a </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &#39;abc&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">;</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">var</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> foo </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &#39;foo&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">console.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">log</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(foo); </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// &#39;foo&#39;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">function</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> foo</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">() {}</span></span></code></pre><div class="line-numbers-wrapper" aria-hidden="true"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><ul><li><strong>作用域</strong>在函数定义时就已经确定，但它所包含的变量在函数被调用时才被实例化。</li><li><strong>作用域链</strong>则是在函数调用时动态创建的，它确保了变量的正确查找顺序和可访问性。</li></ul><p>函数执行上下文</p><ol><li>会关联一个 activation object （AO）；</li><li>这个AO对象会使用arguments作为初始化，并且初始值是传入的参数；</li><li>这个AO对象对象会作为执行上下文的VO来存放变量的初始化</li></ol><p>** 函数执行前（准备工作）创建AO **（多次执行函数，传参不同，所以在执行时为变量赋值，即AO赋值）</p><details><summary>执行上下文分为三个阶段，函数执行上下文会在函数被调用的时候创建，执行的生命周期是创建阶段，执行阶段，回收阶段，</summary><p>在创建阶段会做三件事，绑定this指向，创建词法环境，创建变量环境（专门绑定本环境var变量的位置，并会初始化为undefined），</p><p>词法环境里就包含两部分，一个是本环境记录器（本环境的const let和函数），一个是对外部环境的引用（作用域链），当创建阶段结束后，才开始执行代码，代码执行完毕后，执行上下文出栈，然后进入回收阶段，失去引用的堆内存空间会被gc回收，然后再执行执行栈顶还没有执行完的代码，搞清楚执行栈和上下文生命周期流程，也就能解释的通为什么闭包的外层函数中的变量不会被释放，var和fuc会有变量提升了</p></details><p><img src="`+n+`" alt="Untitled.png" loading="lazy"></p><div class="language-typescript vp-adaptive-theme line-numbers-mode"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">return</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> 不会阻止代码的解析，所以函数作用域中已经存在变量a为 </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">undefined</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">;</span></span></code></pre><div class="line-numbers-wrapper" aria-hidden="true"><span class="line-number">1</span><br></div></div><p>面试分类</p><p>项目介绍： 平台、权限（结合微前端的权限设计RBAC）、低代码（循环引用、表单设计）</p><p>前端能力：vue全家桶、 react全家桶、node;源码阅读、微前端</p><p>工程化能力：webpack、rollup、babel、esbuild、vite</p><p>管理能力：脚手架搭建、组件库管理、规范化定制、npm、pnpm、monorepo、multrepo；</p><p>高阶：性能优化、v8引擎、设计模式；</p><p>webpack 懒加载 预加载预获取</p><p>类数组</p><p>vite rollup</p><p>权限：</p><pre><code>公共层——工作台、知识库
+
+
+平台层——数据统计、租户管理、系统管理员、
+
+
+租户层——租户配置（登录配置eg:用户校验、新增｜编辑｜注销用户）
+
+
+项目层——租户下的人员—拥有的项目项目目录——切换项目重新获取权限
+</code></pre><p>动态表单</p><pre><code>基本组件、布局组件、表格组件
+
+
+单个组件基本配置
+
+
+样式布局——主题、字体、label位置
+
+
+条件联动—— 满足（单个｜条件组）条件，执行动作（调用api、赋值、清空、恢复默认值、显示/隐藏、更改属性）
+
+
+字段管理—— 绑定模型字段
+
+
+按钮事件（动作、前置条件）
+
+
+研运一体平台
+
+
+主应用+子应用（工作台、项目、平台配置、租户配置、知识库、数据大盘、帮助中心）
+
+
+主应用：登录、布局、个人信息、面包屑
+
+
+权限：权限分层（平台、租户、项目）
+
+
+角色管理：内置角色、自定义角色；
+
+
+菜单设置：根据权限的分层设置菜单（平台、租户、项目、公共）、按钮和api
+
+
+问题：
+
+- 主应用面包屑无法监听子应用的路由变化，改写子应用的路由，并发送信息给主应用，主应用通过replaceState去修改url
+- store数据传输给子应用，无法同步问题
+
+动态表单：
+
+
+复杂问题-》问题拆解-〉逐步击破-》链路串联
+
+
+表单默认值设置-〉解析规则-》提取参数-〉类似于递归，只需完成其中一步，其余依靠递归-》拓扑图-〉有向无环图-》后续动作以及拓扑排序 -〉优化-》提取公共方法
+
+
+表单管理平台-新建表单，表单基础信息维护，表单发布，
+
+
+表单引擎、
+
+
+表单设计器：基本表单配置（默认值：难点）；样式布局、条件联动、字段管理、按钮事件；
+
+
+组件库；
+
+
+默认值： 基本类型、api获取、公示编辑器 -》循环引用的问题-〉图形数据结构（有向无环图）→解析 → 拓扑排序 → 从顶点开始遍历 -》判断是否有环
+
+
+条件联动：条件组或单个条件
+
+
+[https://m.zhipin.com/mpa/html/get/column?contentId=d0b1c0582df56795qxB83Ny8&amp;source=myhome&amp;sessionId=](https://m.zhipin.com/mpa/html/get/column?contentId=d0b1c0582df56795qxB83Ny8&amp;sessionId=)
+
+
+遇到bug，解决偶现问题的思路
+
+
+首先要反复操作-》找到偶现的规律-〉描述问题-》缩小问题的范围（触发该问题的执行动作或时机）借助开发者工具debug\\console-〉寻求帮助（stackoverflow\\mdn\\同事）
+</code></pre>`,148)]))}const g=p(s,[["render",l]]);export{k as __pageData,g as default};
