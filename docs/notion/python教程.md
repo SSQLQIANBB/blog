@@ -1145,6 +1145,54 @@ p = Person.objects.create(
 ```
 
 
+对于新增数据，Django提供了两种方法，`save()`和`create()`方法。
+
+
+### **方法一：save方法**
+
+
+```python
+from .models import Article
+
+article = Article(title="My first article", body="My first article body")
+article.save()
+```
+
+
+注意: 该方法如果不主动选择save(), 创建的对象实例只会存于内存之中，不会保存到数据库中去。正因为如此，Django还提供了更便捷的create方法。
+
+
+### **方法二：create方法**
+
+
+```python
+article = Article.objects.create(title="My first article", body="My first article body")
+```
+
+
+为了避免重复创建数据表中已存在的条目，Django还提供了`get_or_create`方法。它会返回查询到的或新建的模型对象实例，还会返回这个对象实例是否是刚刚创建的。
+
+
+```python
+obj, created = Article.objects.get_or_create(title="My first article", body="My first article body")
+```
+
+
+### **方法三：bulk_create方法**
+
+
+在Django中向数据库中插入多条数据时，每使用save或create方法保存一条就会执行一次SQL。而Django提供的`bulk_create`方法可以一次SQL添加多条数据，效率要高很多，如下所示：
+
+
+```python
+# 内存生成多个对象实例
+articles  = [Article(title="title1", body="body1"), Article(title="title2", body="body2"), Article(title="title3", body="body3")]
+
+# 执行一次SQL插入数据
+Article.objects.bulk_create(articles)
+```
+
+
 ### 修改数据
 
 
@@ -1153,6 +1201,78 @@ p = Person.objects.create(
 b5 = Blog.objects.get(name='b5')  # 获取名称为'b5'的记录
 b5.name = 'new Name'  # 修改字段值
 b5.save()  # 保存修改
+```
+
+
+### **方法一： save方法**
+
+
+```python
+article = Article.objects.get(id=1)
+article.title = "New article title"
+article.save()
+```
+
+
+### **方法二：update方法同时更新多篇文章**
+
+
+```python
+# 更新所有文章标题
+article = Article.objects.filter(title__icontains='python').update(title='Django')
+```
+
+
+### **方法三： bulk_update方法**
+
+
+与`bulk_create`方法类似，Django还提供了`bulk_update`方法可以对数据库里的数据进行批量更新。
+
+
+```python
+# 1. 获取需要更新的对象列表
+articles = Article.objects.filter(category="tech")  # 查询需要更新的记录
+
+# 2. 修改对象的属性
+for article in articles:
+    article.read_count += 1  # 例如：将阅读量+1
+    article.status = "published"  # 例如：更新状态
+
+# 3. 批量更新（指定需要更新的字段）
+Article.objects.bulk_update(articles, ["read_count", "status"])
+```
+
+
+# **删**
+
+
+删即从数据表中删除一个已有条目。Django也允许同时删除一条或多条数据。
+
+
+### **删除单条数据**
+
+
+```python
+# 删除第5篇文章
+Article.objects.get(pk=5).delete()
+```
+
+
+### **删除部分数据**
+
+
+```python
+# 删除标题含有python的文章
+Article.objects.filter(title__icontains="python").delete()
+```
+
+
+### **删除所有数据**
+
+
+```python
+# 慎用
+Article.objects.all().delete()
 ```
 
 
