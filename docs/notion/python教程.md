@@ -1717,3 +1717,173 @@ BaseException
            └── UserWarning
 ```
 
+
+## 路由配置
+
+
+`path`和`re_path`传递参数方式如下:
+
+- `path`方法：采用双尖括号`<变量类型:变量名>`或`<变量名>`传递，例如`<int:id>`, `<slug:slug>`或`<username>`。
+- `re_path`方法: 采用命名组`(?P<变量名>表达式)`的方式传递参数。`re_path`里引号前面的小写r表示引号里为正则表达式, `^`代表开头，`$`代表以结尾，`\d+`代表正整数。
+
+```python
+path('blog/<int:id>/', views.blog_detail, name='blog_detail'),  # Example of using path with type converter
+re_path(r'^blog/(?P<id>\d+)/$', views.bog_detail, name='blog_detail_re'),  # Example of using re_path with named group
+```
+
+
+在使用`path`和`re_path`方法设计urls需注意：
+
+- url中的参数名要用尖括号，而不是圆括号；
+- 匹配模式的最开头不需要添加斜杠`/`，但建议以斜杠结尾;
+- 使用`re_path`时不一定总是以`$`结尾，有时不能加。比如下例中把`blog.urls`通过`re_path`加入到项目urls中时就不能以`$`结尾，因为这里的`blog/`并不是完整的url，只是一个开头而已。
+
+```python
+from django.urls import include, re_path
+
+    urlpatterns = [
+        re_path(r'^blog/', include('blog.urls')), # include添加子路由
+        ...
+    ]
+```
+
+
+## **更多URL配置示例**
+
+
+`path`支持匹配的数据类型只有`str`,`int`, `slug`, `uuid`四种。一般来说`re_path`更强大，但写起来更复杂一些，我们来看看更多案例。
+
+
+```python
+# 示例一，PATH
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('articles/2003/', views.special_case_2003),
+    path('articles/<int:year>/', views.year_archive),
+    path('articles/<int:year>/<int:month>/', views.month_archive),
+    path('articles/<int:year>/<int:month>/<slug:slug>/', views.article_detail),
+]
+
+# 示例二：RE_PATH，与上例等同
+from django.urls import path, re_path
+from . import views
+
+urlpatterns = [
+    path('articles/2003/', views.special_case_2003),
+    re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+    re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
+    re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$', views.article_detail),
+]
+
+# app_name = 'blog' # 命名空间，后面会用到。
+urlpatterns = [
+    path('blog/articles/', views.article_list, name = 'article_list'),
+    path('blog/articles/create/', views.article_create, name = 'article_create'),
+    path('blog/articles/<int:id>/', views.article_detail, name = 'article_detail'),
+    path('blog/articles/<int:id>/update/', views.article_update, name = 'article_update'),
+    path('blog/articles/<int:id>/delete/', views.article_update, name = 'article_delete'),
+]
+```
+
+
+### **使用命名URL**
+
+
+```python
+{% for article in articles %}
+    <a href="{% url 'article_detail' article.id %}">{{ article.title }}</a>
+{% endfor %}
+```
+
+
+`url`是个模板标签，其作用是对命名的url进行方向解析，动态生成链接。
+
+
+注意：命名的url里有几个参数，使用`url`模板标签反向生成动态链接时，就需要向它传递几个参数。比如我们的命名url`article_detail`里有整数型`id`这个参数，我们在模板中还需要传递`article.id`。
+
+
+### **硬编码URL - 不建议**
+
+
+```python
+{% for article in articles %}
+    <a href="blog/articles/{{ article.id }}">{{ article.title }}</a>
+{% endfor %}
+```
+
+
+如果你还没意识到方法1的好处，那么想想吧，假设老板让你把全部模板链接由blog/articles/id改为blog/article/id, 那种方法更快？更改所有html文件里的链接，还是只改URL配置里的一个字母?
+
+
+那么问题来了。假设不同的app（比如news和blog)里都有`article_detail`这个命名URL, 我们怎么避免解析冲突呢？ 这时我们只需要在`blog/urls.py`加上`app_name='blog'`这个命名空间即可，然后在模板中以`blog:article_detail`使用即可。
+
+
+```python
+{% for article in articles %}
+    <a href="{% url 'blog:article_detail' article.id %}">{{ article.title }}</a>
+{% endfor %}
+```
+
+
+命名的URL一般只在模板里使用，不能直接在视图里使用。如果我们有了命名的URL，我们如何把它转化成常规的URL在视图里使用呢？
+
+
+Django提供的`reverse()`方法很容易实现这点。它在视图中可以对命名urls进行反向解析，生成动态链接。
+
+
+```python
+from django.urls import reverse
+
+# output blog/articles/id
+reverse('blog:article_detail', args=[id])
+```
+
+
+## **URL指向基于类的视图(View)**
+
+
+目前`path`和`re_path`都只能指向视图view里的一个函数或方法，而不能直接指向一个基于类的视图(Class based view)。Django提供了一个额外`as_view()`方法，可以将一个类伪装成方法。这点在当你使用Django自带的类视图或自定义的类视图时非常重要。
+
+
+具体使用方式如下:
+
+
+```python
+# blog/urls.py
+from django.urls import path, re_path
+from . import views
+ 
+urlpatterns = [
+    # path('blog/articles/', views.article_list, name = 'article_list'),
+    path('blog/articles/', views.ArticleList.as_view(), name='article_list'),
+]
+ 
+# View (in blog/views.py)
+from django.views.generic import ListView
+from .views import Article
+ 
+class ArticleList(ListView):
+    queryset = Article.objects.filter(date__lte=timezone.now()).order_by('date')[:5]
+    context_object_name = 'article_list‘
+    template_name = 'blog/article_list.html'
+```
+
+
+## **通过URL传递额外的参数**
+
+
+在你配置URL时，你还可以通过字典的形式传递额外的参数给视图, 而不用把这个参数写在链接里。如下面案例所示:
+
+
+```python
+# blog/urls.py
+from django.urls import path, re_path
+from . import views
+ 
+urlpatterns = [
+    path('', views.ArticleList.as_view(), name='article_list', {'blog_id': 3}),
+]
+```
+
