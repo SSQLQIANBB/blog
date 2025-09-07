@@ -1887,3 +1887,94 @@ urlpatterns = [
 ]
 ```
 
+
+Django提供了很多通用的基于类的视图，来帮我们简化视图的编写。这些View与上述操作的对应关系如下:
+
+- 展示对象列表（比如所有用户，所有文章）- `ListView`
+- 展示某个对象的详细信息（比如用户资料，比如文章详情) - `DetailView`
+- 通过表单创建某个对象（比如创建用户，新建文章）- `CreateView`
+- 通过表单更新某个对象信息（比如修改密码，修改文字内容）- `UpdateView`
+- 用户填写表单后转到某个完成页面 - `FormView`
+- 删除某个对象 - `DeleteView`
+
+上述常用通用视图一共有6个，前2个属于展示类视图(Display view), 后面4个属于编辑类视图(Edit view)。下面我们就来看下这些通用视图是如何工作的，如何简化我们代码的。
+
+
+注意：如果你要使用Edit view，请务必在模型里里定义`get_absolute_url()`方法，否则会出现错误。这是因为通用视图在对一个对象完成编辑后，需要一个返回链接。`get_absolute_url()`可以为某个对象生成独一无二的url。
+
+
+## **自定义表单类**
+
+
+Django提供了两种自定义表单的方式：继承`Form`类和`ModelForm`类。前者你需要自定义表单中的字段，后者可以根据Django模型自动生成表单，如下所示：
+
+
+```python
+# app/forms.py
+# 自定义表单字段
+from django import forms
+from .models import Contact
+
+class ContactForm1(forms.Form):
+    name = forms.CharField(label="Your Name", max_length=255)
+    email = forms.EmailField(label="Email address")
+
+# 根据模型创建
+class ContactForm2(forms.ModelForm):
+    
+    class Meta:
+        model = Contact
+        fields = ('name', 'email',)
+        
+# 自定义验证信息及提示
+class LoginForm(forms.Form):  
+    username = forms.CharField(
+        required=True,
+        max_length=20,
+        min_length=6,
+        error_messages={
+            'required': '用户名不能为空',
+            'max_length': '用户名长度不得超过20个字符',
+            'min_length': '用户名长度不得少于6个字符',
+        }
+    )
+    password = forms.CharField(
+        required=True,
+        max_length=20,
+        min_length=6,
+        error_messages={
+            'required': '密码不能为空',
+            'max_length': '密码长度不得超过20个字符',
+            'min_length': '密码长度不得少于6个字符',
+        }
+    )
+```
+
+
+对于基继承`ModelForm`类的表单, 我们可以在`Meta`选项下widget中来自定义错误信息，如下面代码所示:
+
+
+```python
+from django.forms import ModelForm, Textarea
+from myapp.models import Author
+
+class AuthorForm(ModelForm):
+    class Meta:
+        model = Author
+        fields = ('name', 'title', 'birth_date')
+        widgets = {
+            'name': Textarea(attrs={'cols': 80, 'rows': 20}),  # 关键是这一行
+        }
+        labels = {
+            'name': 'Author',
+        }
+        help_texts = {
+            'name': 'Some useful help text.',
+        }
+        error_messages = {
+            'name': {
+                'max_length': "This writer's name is too long.",
+            },
+        }
+```
+
