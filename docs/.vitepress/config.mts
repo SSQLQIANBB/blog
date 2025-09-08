@@ -25,7 +25,7 @@ export default withMermaid({
     // https://vitepress.dev/reference/default-theme-config
     logo: '/favicon.svg',
     nav: generateNav(),
-    outline: [2, 3], // 大纲中显示的标题级别
+    outline: [1, 2, 3], // 大纲中显示的标题级别
     aside: true,
     sidebar: generateSidebar(allFiles),
 

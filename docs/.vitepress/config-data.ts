@@ -226,6 +226,6 @@ export const allFiles = [
   'notion/问题记录.md',
   'notion/阅读记录.md',
   'records/index.md',
-  'records/vitepress.md'
-
+  'records/vitepress.md',
+'records/python-questions.md'
 ];

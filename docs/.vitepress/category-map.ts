@@ -72,6 +72,7 @@ export const fileToCategoryMap: Record<string, string> = {
   'notion/node.md': '后端',
   'notion/python教程.md': '后端',
   'notion/C++.md': '后端',
+  'records/python-questions.md': '后端',
   
   // 计算机基础分类
   'notion/计算机网络.md': '计算机基础',
