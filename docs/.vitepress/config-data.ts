@@ -4,10 +4,6 @@ import { specialNavItems } from './nav-items';
 
 // 获取文件对应的分类
 export function getCategoryForFile(fileName: string): string | null {
-  // 处理records目录下的文件
-  if (fileName.startsWith('records/')) {
-    return fileToCategoryMap[fileName] || null;
-  }
   
   return fileToCategoryMap[fileName] || null;
 }
@@ -51,27 +47,15 @@ export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
               .split('/')
               .pop()
               ?.replace(/^./, str => str.toUpperCase()) || fileName;
+
             
-            // 处理 records 目录
-            if (file.startsWith('records/')) {
-              return {
-                text: displayName,
-                link: `/records/${encodeURIComponent(fileName.replace('records/', ''))}`
-              };
-            }
             
-            // 处理 notion 目录
-            if (file.startsWith('notion/')) {
-              return {
-                text: displayName,
-                link: `/notion/${encodeURIComponent(fileName.replace('notion/', ''))}`
-              };
-            }
+            
             
             // 其他情况
             return {
               text: displayName,
-              link: `/notion/${encodeURIComponent(fileName)}`
+              link: `${encodeURIComponent(fileName)}`
             };
           });
         
@@ -82,29 +66,6 @@ export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
         });
       }
     });
-  
-  // 添加records目录
-  const recordsFiles = files.filter(file => file.startsWith('records/'));
-  if (recordsFiles.length > 0) {
-    const recordItems: DefaultTheme.SidebarItem[] = recordsFiles.map(file => {
-      const fileName = file.replace('.md', '').replace('records/', '');
-      const displayName = fileName
-        .split('/')
-        .pop()
-        ?.replace(/^./, str => str.toUpperCase()) || fileName;
-      
-      return {
-        text: displayName,
-        link: `/records/${encodeURIComponent(fileName)}`
-      };
-    });
-    
-    sidebar.unshift({
-      text: '调试记录',
-      collapsed: false,
-      items: recordItems
-    });
-  }
   
   return sidebar;
 }
@@ -227,5 +188,6 @@ export const allFiles = [
   'notion/阅读记录.md',
   'records/index.md',
   'records/vitepress.md',
-'records/python-questions.md'
+  'python/python-questions.md',
+  'python/settings.md',
 ];
