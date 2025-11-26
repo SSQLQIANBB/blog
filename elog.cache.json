@@ -3111,7 +3111,7 @@
     {
       "id": "28cb3c50-ecaa-8011-86ef-d835de6581e3",
       "doc_id": "28cb3c50-ecaa-8011-86ef-d835de6581e3",
-      "updated": 1761189660000,
+      "updated": 1764175320000,
       "properties": {
         "上次编辑者": {
           "object": "user",
@@ -3136,12 +3136,13 @@
         "子级 项目": [],
         "上级 项目": [],
         "创建时间": "2025-10-14T09:27:00.000Z",
-        "上次更新时间": "2025-10-23T03:21:00.000Z",
+        "上次更新时间": "2025-11-26T16:42:00.000Z",
         "文档名称": "桌面远程控制功能",
+        "cover": "https://www.notion.so/images/page-cover/woodcuts_7.jpg",
         "title": "桌面远程控制功能",
         "urlname": "28cb3c50-ecaa-8011-86ef-d835de6581e3",
         "date": "2025-10-14 17:27:00",
-        "updated": "2025-10-23 11:21:00"
+        "updated": "2025-11-27 00:42:00"
       },
       "realName": "桌面远程控制功能",
       "relativePath": "/桌面远程控制功能.md",
@@ -3150,7 +3151,7 @@
     {
       "id": "2b0b3c50-ecaa-80cb-b414-c015b57888b2",
       "doc_id": "2b0b3c50-ecaa-80cb-b414-c015b57888b2",
-      "updated": 1763562540000,
+      "updated": 1764175380000,
       "properties": {
         "上次编辑者": {
           "object": "user",
@@ -3175,12 +3176,13 @@
         "子级 项目": [],
         "上级 项目": [],
         "创建时间": "2025-11-19T14:29:00.000Z",
-        "上次更新时间": "2025-11-19T14:29:00.000Z",
+        "上次更新时间": "2025-11-26T16:43:00.000Z",
         "文档名称": "学习笔记",
+        "cover": "https://www.notion.so/images/page-cover/woodcuts_9.jpg",
         "title": "学习笔记",
         "urlname": "2b0b3c50-ecaa-80cb-b414-c015b57888b2",
         "date": "2025-11-19 22:29:00",
-        "updated": "2025-11-19 22:29:00"
+        "updated": "2025-11-27 00:43:00"
       },
       "realName": "学习笔记",
       "relativePath": "/学习笔记.md",
@@ -5187,7 +5189,7 @@
       "object": "page",
       "id": "28cb3c50-ecaa-8011-86ef-d835de6581e3",
       "created_time": "2025-10-14T09:27:00.000Z",
-      "last_edited_time": "2025-10-23T03:21:00.000Z",
+      "last_edited_time": "2025-11-26T16:42:00.000Z",
       "created_by": {
         "object": "user",
         "id": "39a4debf-54b3-4ff5-b7aa-2a5a8053ab7b"
@@ -5196,8 +5198,16 @@
         "object": "user",
         "id": "39a4debf-54b3-4ff5-b7aa-2a5a8053ab7b"
       },
-      "cover": null,
-      "icon": null,
+      "cover": {
+        "type": "external",
+        "external": {
+          "url": "https://www.notion.so/images/page-cover/woodcuts_7.jpg"
+        }
+      },
+      "icon": {
+        "type": "emoji",
+        "emoji": "🖥️"
+      },
       "parent": {
         "type": "database_id",
         "database_id": "23ab3c50-ecaa-80b4-94d2-c5f1e31483c5"
@@ -5229,12 +5239,13 @@
         "子级 项目": [],
         "上级 项目": [],
         "创建时间": "2025-10-14T09:27:00.000Z",
-        "上次更新时间": "2025-10-23T03:21:00.000Z",
+        "上次更新时间": "2025-11-26T16:42:00.000Z",
         "文档名称": "桌面远程控制功能",
+        "cover": "https://www.notion.so/images/page-cover/woodcuts_7.jpg",
         "title": "桌面远程控制功能",
         "urlname": "28cb3c50-ecaa-8011-86ef-d835de6581e3",
         "date": "2025-10-14 17:27:00",
-        "updated": "2025-10-23 11:21:00"
+        "updated": "2025-11-27 00:42:00"
       },
       "url": "https://www.notion.so/28cb3c50ecaa801186efd835de6581e3",
       "public_url": null
@@ -5243,7 +5254,7 @@
       "object": "page",
       "id": "2b0b3c50-ecaa-80cb-b414-c015b57888b2",
       "created_time": "2025-11-19T14:29:00.000Z",
-      "last_edited_time": "2025-11-19T14:29:00.000Z",
+      "last_edited_time": "2025-11-26T16:43:00.000Z",
       "created_by": {
         "object": "user",
         "id": "39a4debf-54b3-4ff5-b7aa-2a5a8053ab7b"
@@ -5252,8 +5263,16 @@
         "object": "user",
         "id": "39a4debf-54b3-4ff5-b7aa-2a5a8053ab7b"
       },
-      "cover": null,
-      "icon": null,
+      "cover": {
+        "type": "external",
+        "external": {
+          "url": "https://www.notion.so/images/page-cover/woodcuts_9.jpg"
+        }
+      },
+      "icon": {
+        "type": "emoji",
+        "emoji": "📚"
+      },
       "parent": {
         "type": "database_id",
         "database_id": "23ab3c50-ecaa-80b4-94d2-c5f1e31483c5"
@@ -5285,12 +5304,13 @@
         "子级 项目": [],
         "上级 项目": [],
         "创建时间": "2025-11-19T14:29:00.000Z",
-        "上次更新时间": "2025-11-19T14:29:00.000Z",
+        "上次更新时间": "2025-11-26T16:43:00.000Z",
         "文档名称": "学习笔记",
+        "cover": "https://www.notion.so/images/page-cover/woodcuts_9.jpg",
         "title": "学习笔记",
         "urlname": "2b0b3c50-ecaa-80cb-b414-c015b57888b2",
         "date": "2025-11-19 22:29:00",
-        "updated": "2025-11-19 22:29:00"
+        "updated": "2025-11-27 00:43:00"
       },
       "url": "https://www.notion.so/2b0b3c50ecaa80cbb414c015b57888b2",
       "public_url": null
