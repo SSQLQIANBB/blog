@@ -181,7 +181,7 @@ index(’name’)：只遍历store数据中name不为空的数据；
 快速查询，类似与sql中快查字段
 
 
-例如json结构：{id: 1, name: ‘liming’, age: 30, phone: ‘xxx’ }
+例如json结构：`{id: 1, name: 'liming', age: 30, phone: 'xxx' }`
 
 
 想查询phone为123时，
