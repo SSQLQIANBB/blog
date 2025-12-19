@@ -25,7 +25,7 @@ const ellipsisStyleRef = computed(() => {
   const expanded = expandedRef.value;
 
   // 多行模式
-  if (props.lineClamp !== null) {
+  if (props.lineClamp) {
     return {
       display: '-webkit-box',
       WebkitBoxOrient: 'vertical',
@@ -62,7 +62,8 @@ function checkOverflow() {
     try {
       // 使用 getBoundingClientRect() 统一测量口径（更稳定）
       const containerRect = el.getBoundingClientRect();
-      if (props.lineClamp !== null) {
+
+      if (props.lineClamp) {
         // 多行：用高度判断（高度判断保持不变）
         overflow = el.scrollHeight > el.clientHeight + 1; // 加个 1px 容差
       } else {
@@ -100,7 +101,6 @@ function onResize() {
 
 onMounted(() => {
   nextTick(checkOverflow);
-
   window.addEventListener('resize', onResize);
 });
 

@@ -3191,7 +3191,7 @@
     {
       "id": "2ccb3c50-ecaa-808e-b341-fd360265985c",
       "doc_id": "2ccb3c50-ecaa-808e-b341-fd360265985c",
-      "updated": 1765933980000,
+      "updated": 1766137860000,
       "properties": {
         "上次编辑者": {
           "object": "user",
@@ -3216,13 +3216,13 @@
         "子级 项目": [],
         "上级 项目": [],
         "创建时间": "2025-12-17T01:11:00.000Z",
-        "上次更新时间": "2025-12-17T01:13:00.000Z",
+        "上次更新时间": "2025-12-19T09:51:00.000Z",
         "文档名称": "组件：超出省略（vue3+element-plus）",
         "cover": "https://www.notion.so/images/page-cover/rijksmuseum_avercamp_1608.jpg",
         "title": "组件：超出省略（vue3+element-plus）",
         "urlname": "2ccb3c50-ecaa-808e-b341-fd360265985c",
         "date": "2025-12-17 09:11:00",
-        "updated": "2025-12-17 09:13:00"
+        "updated": "2025-12-19 17:51:00"
       },
       "realName": "组件：超出省略（vue3+element-plus）",
       "relativePath": "/组件：超出省略（vue3+element-plus）.md",
@@ -5359,7 +5359,7 @@
       "object": "page",
       "id": "2ccb3c50-ecaa-808e-b341-fd360265985c",
       "created_time": "2025-12-17T01:11:00.000Z",
-      "last_edited_time": "2025-12-17T01:13:00.000Z",
+      "last_edited_time": "2025-12-19T09:51:00.000Z",
       "created_by": {
         "object": "user",
         "id": "39a4debf-54b3-4ff5-b7aa-2a5a8053ab7b"
@@ -5409,13 +5409,13 @@
         "子级 项目": [],
         "上级 项目": [],
         "创建时间": "2025-12-17T01:11:00.000Z",
-        "上次更新时间": "2025-12-17T01:13:00.000Z",
+        "上次更新时间": "2025-12-19T09:51:00.000Z",
         "文档名称": "组件：超出省略（vue3+element-plus）",
         "cover": "https://www.notion.so/images/page-cover/rijksmuseum_avercamp_1608.jpg",
         "title": "组件：超出省略（vue3+element-plus）",
         "urlname": "2ccb3c50-ecaa-808e-b341-fd360265985c",
         "date": "2025-12-17 09:11:00",
-        "updated": "2025-12-17 09:13:00"
+        "updated": "2025-12-19 17:51:00"
       },
       "url": "https://www.notion.so/vue3-element-plus-2ccb3c50ecaa808eb341fd360265985c",
       "public_url": null
