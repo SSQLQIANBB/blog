@@ -1,4 +1,6 @@
 import { DefaultTheme } from 'vitepress';
+import { readdirSync, statSync } from 'fs';
+import { join, relative, extname } from 'path';
 import { categoryMap, fileToCategoryMap } from './category-map';
 import { specialNavItems } from './nav-items';
 
@@ -8,10 +10,30 @@ export function getCategoryForFile(fileName: string): string | null {
   return fileToCategoryMap[fileName] || null;
 }
 
+// 将文件路径转换为 VitePress 链接
+// 正确处理包含特殊字符（空格、&、中文等）的文件名
+function filePathToLink(filePath: string): string {
+  // 移除 .md 扩展名
+  const pathWithoutExt = filePath.replace(/\.md$/, '');
+  
+  // 按路径分隔符分割
+  const parts = pathWithoutExt.split('/');
+  
+  // 对每个路径段分别编码，保持路径分隔符不变
+  const encodedParts = parts.map(part => {
+    // 对每个部分进行 URL 编码，但保留路径分隔符
+    return encodeURIComponent(part);
+  });
+  
+  // 重新组合路径，添加前导斜杠
+  return '/' + encodedParts.join('/');
+}
+
 // 根据文件列表生成侧边栏配置
 export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
   // 按分类组织文件
   const categorizedFiles: Record<string, string[]> = {};
+  const uncategorizedFiles: string[] = [];
   
   files.forEach(file => {
     const category = getCategoryForFile(file);
@@ -20,6 +42,9 @@ export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
         categorizedFiles[category] = [];
       }
       categorizedFiles[category].push(file);
+    } else {
+      // 未分组的文件
+      uncategorizedFiles.push(file);
     }
   });
   
@@ -47,15 +72,13 @@ export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
               .split('/')
               .pop()
               ?.replace(/^./, str => str.toUpperCase()) || fileName;
-
             
+            // 生成正确的链接
+            const link = filePathToLink(file);
             
-            
-            
-            // 其他情况
             return {
               text: displayName,
-              link: `${encodeURIComponent(fileName)}`
+              link: link
             };
           });
         
@@ -66,6 +89,41 @@ export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
         });
       }
     });
+  
+  // 如果有未分组的文件，添加到"全部文档"分组
+  if (uncategorizedFiles.length > 0) {
+    const allDocsItems: DefaultTheme.SidebarItem[] = uncategorizedFiles
+      .map(file => {
+        // 处理特殊导航项
+        if (specialNavItems[file]) {
+          return {
+            text: specialNavItems[file].text,
+            link: specialNavItems[file].link
+          };
+        }
+        
+        // 一般文件
+        const fileName = file.replace('.md', '');
+        const displayName = fileName
+          .split('/')
+          .pop()
+          ?.replace(/^./, str => str.toUpperCase()) || fileName;
+        
+        // 生成正确的链接
+        const link = filePathToLink(file);
+        
+        return {
+          text: displayName,
+          link: link
+        };
+      });
+    
+    sidebar.push({
+      text: '其他文档',
+      collapsed: false,
+      items: allDocsItems
+    });
+  }
   
   return sidebar;
 }
@@ -113,81 +171,78 @@ export function generateFeatures(): { title: string; details: string }[] {
   ];
 }
 
-// 导出所有文件列表（供其他模块使用）
-export const allFiles = [
-  'notion/babel.md',
-  'notion/basic & extra.md',
-  'notion/C++.md',
-  'notion/Commonjs和ES Module.md',
-  'notion/CSS.md',
-  'notion/data为什么是函数问题.md',
-  'notion/dpr和自适应布局.md',
-  'notion/eslint.md',
-  'notion/git.md',
-  'notion/HTML.md',
-  'notion/index.md',
-  'notion/indexDB & webSQL.md',
-  'notion/JavaScript.md',
-  'notion/let, var.md',
-  'notion/linux常用命令.md',
-  'notion/loader.md',
-  'notion/micro-app.md',
-  'notion/node.md',
-  'notion/notion持续部署github.md',
-  'notion/npm & yarn & pnpm.md',
-  'notion/performance.md',
-  'notion/prettier.md',
-  'notion/python教程.md',
-  'notion/react.md',
-  'notion/Ref原理.md',
-  'notion/rollup.md',
-  'notion/socket.md',
-  'notion/stylelint.md',
-  'notion/tapable.md',
-  'notion/TCP.md',
-  'notion/this指向、super关键字.md',
-  'notion/tsconfig.md',
-  'notion/typescript.md',
-  'notion/vite.md',
-  'notion/vue Router.md',
-  'notion/vue.md',
-  'notion/vue2-diff.md',
-  'notion/vue3-diff.md',
-  'notion/vuex中在mutation中使用异步.md',
-  'notion/web API.md',
-  'notion/web component.md',
-  'notion/webpack.md',
-  'notion/WebRTC.md',
-  'notion/web前端监控.md',
-  'notion/web性能.md',
-  'notion/worker.md',
-  'notion/与vue不同点.md',
-  'notion/作用域和作用域链.md',
-  'notion/前端面试.md',
-  'notion/原型和原型链.md',
-  'notion/垃圾回收机制.md',
-  'notion/好看的滚动条样式.md',
-  'notion/对象转为可迭代对象.md',
-  'notion/工程化&模块化.md',
-  'notion/常用钩子.md',
-  'notion/开发注意事项.md',
-  'notion/接口问题.md',
-  'notion/服务器.md',
-  'notion/父组件渲染子组件内容.md',
-  'notion/简单请求&预检请求.md',
-  'notion/类型转换（toPrimitive）.md',
-  'notion/组件：table移动端表格.md',
-  'notion/组件：虚拟列表.md',
-  'notion/缓存.md',
-  'notion/脚手架搭建.md',
-  'notion/表格组件自动高度设置.md',
-  'notion/计算机网络.md',
-  'notion/设计模式.md',
-  'notion/迭代器、生成器.md',
-  'notion/问题记录.md',
-  'notion/阅读记录.md',
-  'records/index.md',
-  'records/vitepress.md',
-  'python/python-questions.md',
-  'python/settings.md',
-];
+// 扫描目录并获取所有 md 文件
+function scanDirectory(dir: string, baseDir: string = dir): string[] {
+  let results: string[] = [];
+  const files = readdirSync(dir);
+  
+  files.forEach(file => {
+    const filePath = join(dir, file);
+    const stat = statSync(filePath);
+    
+    if (stat.isDirectory()) {
+      // 递归扫描子目录
+      results = results.concat(scanDirectory(filePath, baseDir));
+    } else if (extname(file) === '.md') {
+      // 获取相对于基础目录的路径
+      const relativePath = relative(baseDir, filePath).replace(/\\/g, '/');
+      results.push(relativePath);
+    }
+  });
+  
+  return results;
+}
+
+// 自动扫描并获取所有文件列表
+export function getAllFiles(): string[] {
+  // VitePress 的 srcDir 设置为 '.'，配置文件在 docs/.vitepress/ 下
+  // 在 VitePress 构建时，工作目录通常是项目根目录
+  // 但配置文件在 docs/.vitepress/ 下，所以我们需要找到 docs 目录
+  // 最简单的方式：从配置文件位置向上找一级就是 docs 目录
+  let docsDir: string;
+  
+  // @ts-ignore - __dirname 在 CommonJS 环境中可用
+  if (typeof __dirname !== 'undefined') {
+    // @ts-ignore
+    docsDir = join(__dirname, '..');
+  } else {
+    // ES 模块环境，VitePress 会将工作目录设置为 srcDir（即 docs 目录）
+    docsDir = process.cwd();
+  }
+  
+  const notionDir = join(docsDir, 'notion');
+  const recordsDir = join(docsDir, 'records');
+  const pythonDir = join(docsDir, 'python');
+  
+  const notionFiles: string[] = [];
+  const recordsFiles: string[] = [];
+  const pythonFiles: string[] = [];
+  
+  // 扫描各个目录
+  try {
+    if (statSync(notionDir).isDirectory()) {
+      notionFiles.push(...scanDirectory(notionDir, docsDir).map(file => `notion/${file}`));
+    }
+  } catch (e) {
+    // 目录不存在，跳过
+  }
+  
+  try {
+    if (statSync(recordsDir).isDirectory()) {
+      recordsFiles.push(...scanDirectory(recordsDir, docsDir).map(file => `records/${file}`));
+    }
+  } catch (e) {
+    // 目录不存在，跳过
+  }
+  
+  try {
+    if (statSync(pythonDir).isDirectory()) {
+      pythonFiles.push(...scanDirectory(pythonDir, docsDir).map(file => `python/${file}`));
+    }
+  } catch (e) {
+    // 目录不存在，跳过
+  }
+  
+  // 合并并排序
+  return [...notionFiles, ...recordsFiles, ...pythonFiles].sort();
+}

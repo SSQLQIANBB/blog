@@ -1,7 +1,7 @@
 // import { defineConfig } from "vitepress";
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import { generateNav } from './nav-items';
-import { generateSidebar, allFiles } from './config-data';
+import { generateSidebar, getAllFiles } from './config-data';
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
@@ -27,7 +27,7 @@ export default withMermaid({
     nav: generateNav(),
     outline: [1, 2, 3], // 大纲中显示的标题级别
     aside: true,
-    sidebar: generateSidebar(allFiles),
+    sidebar: generateSidebar(getAllFiles()),
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/SSQLQIANBB/blog' },

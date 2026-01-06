@@ -31,27 +31,38 @@ function generateFileList() {
   return [...notionFiles, ...recordsFiles];
 }
 
-// 更新config-data.ts文件
-function updateConfigData() {
+// 检查未分组的文件
+function checkUncategorizedFiles() {
   const files = generateFileList();
   
-  // 读取现有config-data.ts文件
-  const configDataPath = join(__dirname, 'docs/.vitepress/config-data.ts');
-  const configDataContent = readFileSync(configDataPath, 'utf-8');
+  // 读取 category-map.ts 以检查哪些文件已分组
+  const categoryMapPath = join(__dirname, 'docs/.vitepress/category-map.ts');
+  let categoryMapContent = '';
+  try {
+    categoryMapContent = readFileSync(categoryMapPath, 'utf-8');
+  } catch (error) {
+    console.warn('⚠️  无法读取 category-map.ts，将跳过分组检查');
+    return;
+  }
   
-  // 构建新的文件列表
-  const fileListString = files.map(file => `  '${file}'`).join(',\n');
+  // 检查未分组的文件
+  const sortedFiles = [...files].sort();
+  const uncategorizedFiles = sortedFiles.filter(file => {
+    // 检查文件是否在 fileToCategoryMap 中
+    return !categoryMapContent.includes(`'${file}':`);
+  });
   
-  // 替换文件列表部分
-  const updatedContent = configDataContent.replace(
-    /export const allFiles = \[[\s\S]*?\];/,
-    `export const allFiles = [\n${fileListString}\n];`
-  );
-  
-  // 写入文件
-  writeFileSync(configDataPath, updatedContent);
-  console.log(`配置文件已更新，共找到 ${files.length} 个文件`);
+  console.log(`✅ 扫描完成，共找到 ${files.length} 个文件`);
+  if (uncategorizedFiles.length > 0) {
+    console.log(`\n📝 提示：发现 ${uncategorizedFiles.length} 个未分组的文件，它们将自动显示在"其他文档"分组中：`);
+    uncategorizedFiles.forEach(file => {
+      console.log(`   - ${file}`);
+    });
+    console.log(`\n💡 如需为这些文件添加分组，请在 docs/.vitepress/category-map.ts 的 fileToCategoryMap 中添加映射。`);
+  } else {
+    console.log(`\n✅ 所有文件都已正确分组！`);
+  }
 }
 
-// 执行更新
-updateConfigData();
+// 执行检查
+checkUncategorizedFiles();

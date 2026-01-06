@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "sync": "elog sync",
-    "sync:local": "elog sync -e .elog.env",
+    "sync": "elog sync && node restore-timestamps && node update-config",
+    "sync:local": "elog sync -e .elog.env && node restore-timestamps && node update-config",
+    "restore-timestamps": "node restore-timestamps",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
