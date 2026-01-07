@@ -15,6 +15,7 @@ export function generateNav(): DefaultTheme.NavItem[] {
     { text: '工程化', link: '/notion/webpack' },
     { text: '工作记录', link: '/notion/问题记录' },
     { text: '文档索引', link: '/documents-index' },
+    { text: '全部文档', link: '/all-docs' },
     { text: '关于', link: '/about' },
   ];
 }

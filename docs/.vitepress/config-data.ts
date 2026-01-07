@@ -4,6 +4,15 @@ import { join, relative, extname } from 'path';
 import { categoryMap, fileToCategoryMap } from './category-map';
 import { specialNavItems } from './nav-items';
 
+// 动态导入子分类映射（避免循环依赖）
+let subCategoryMap: Record<string, string> = {};
+try {
+  const categoryMapModule = require('./category-map');
+  subCategoryMap = categoryMapModule.subCategoryMap || {};
+} catch (e) {
+  // 如果导入失败，使用空对象
+}
+
 // 获取文件对应的分类
 export function getCategoryForFile(fileName: string): string | null {
   
@@ -12,25 +21,124 @@ export function getCategoryForFile(fileName: string): string | null {
 
 // 将文件路径转换为 VitePress 链接
 // 正确处理包含特殊字符（空格、&、中文等）的文件名
-function filePathToLink(filePath: string): string {
+// 直接使用 URL 编码，让 VitePress 自动处理
+export function filePathToLink(filePath: string): string {
   // 移除 .md 扩展名
   const pathWithoutExt = filePath.replace(/\.md$/, '');
   
   // 按路径分隔符分割
   const parts = pathWithoutExt.split('/');
   
-  // 对每个路径段分别编码，保持路径分隔符不变
+  // 对每个路径段分别进行 URL 编码
   const encodedParts = parts.map(part => {
-    // 对每个部分进行 URL 编码，但保留路径分隔符
+    // 直接进行 URL 编码，VitePress 会自动处理空格等特殊字符
     return encodeURIComponent(part);
   });
   
   // 重新组合路径，添加前导斜杠
+  // 注意：VitePress 的 base 是 '/blog/'，但链接不需要包含 base
   return '/' + encodedParts.join('/');
 }
 
-// 根据文件列表生成侧边栏配置
-export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
+// 将文件路径转换为侧边栏配置中使用的路径（用于匹配）
+// 与 filePathToLink 保持一致
+export function filePathToSidebarKey(filePath: string): string {
+  return filePathToLink(filePath);
+}
+
+// 将文件转换为侧边栏项
+function fileToSidebarItem(file: string): DefaultTheme.SidebarItem {
+  // 处理特殊导航项
+  if (specialNavItems[file]) {
+    return {
+      text: specialNavItems[file].text,
+      link: specialNavItems[file].link
+    };
+  }
+  
+  // 一般文件
+  const fileName = file.replace(/\.md$/, '');
+  const displayName = fileName
+    .split('/')
+    .pop()
+    ?.replace(/^./, str => str.toUpperCase()) || fileName;
+  
+  // 生成正确的链接
+  const link = filePathToLink(file);
+  
+  return {
+    text: displayName,
+    link: link
+  };
+}
+
+// 根据分类生成侧边栏配置（支持子分类）
+export function generateSidebarByCategory(files: string[], category: string): DefaultTheme.SidebarItem[] {
+  // 筛选出指定分类的文件
+  const categoryFiles = files.filter(file => getCategoryForFile(file) === category);
+  
+  if (categoryFiles.length === 0) {
+    return [];
+  }
+  
+  // 检查是否有子分类映射
+  const { subCategoryMap } = require('./category-map');
+  const hasSubCategories = categoryFiles.some(file => subCategoryMap[file]);
+  
+  if (hasSubCategories) {
+    // 按子分类分组
+    const subCategoryGroups: Record<string, string[]> = {};
+    const ungroupedFiles: string[] = [];
+    
+    categoryFiles.forEach(file => {
+      const subCategory = subCategoryMap[file];
+      if (subCategory) {
+        if (!subCategoryGroups[subCategory]) {
+          subCategoryGroups[subCategory] = [];
+        }
+        subCategoryGroups[subCategory].push(file);
+      } else {
+        ungroupedFiles.push(file);
+      }
+    });
+    
+    // 生成侧边栏项（按子分类分组）
+    const items: DefaultTheme.SidebarItem[] = [];
+    
+    // 按字母顺序排序子分类
+    Object.keys(subCategoryGroups)
+      .sort()
+      .forEach(subCategory => {
+        const subItems = subCategoryGroups[subCategory]
+          .sort() // 文件也按字母顺序排序
+          .map(file => fileToSidebarItem(file));
+        
+        items.push({
+          text: subCategory,
+          collapsed: false,
+          items: subItems
+        });
+      });
+    
+    // 添加未分组的文件
+    if (ungroupedFiles.length > 0) {
+      const ungroupedItems = ungroupedFiles
+        .sort()
+        .map(file => fileToSidebarItem(file));
+      items.push(...ungroupedItems);
+    }
+    
+    return items;
+  } else {
+    // 没有子分类，直接返回排序后的文件列表
+    return categoryFiles
+      .sort()
+      .map(file => fileToSidebarItem(file));
+  }
+}
+
+// 生成全部文档的侧边栏配置（包括所有分类和未分组的文件）
+export function generateAllDocsSidebar(files: string[]): DefaultTheme.SidebarItem[] {
   // 按分类组织文件
   const categorizedFiles: Record<string, string[]> = {};
   const uncategorizedFiles: string[] = [];
@@ -51,77 +159,85 @@ export function generateSidebar(files: string[]): DefaultTheme.SidebarItem[] {
   // 生成侧边栏配置
   const sidebar: DefaultTheme.SidebarItem[] = [];
   
-  // 按照预定义顺序添加分类
+  // 按照预定义顺序添加分类（支持子分类和图标）
   Object.entries(categoryMap)
     .sort(([,a], [,b]) => a.order - b.order)
     .forEach(([categoryKey, categoryInfo]) => {
       if (categorizedFiles[categoryKey]) {
-        const items: DefaultTheme.SidebarItem[] = categorizedFiles[categoryKey]
-          .map(file => {
-            // 处理特殊导航项
-            if (specialNavItems[file]) {
-              return {
-                text: specialNavItems[file].text,
-                link: specialNavItems[file].link
-              };
+        // 检查是否有子分类
+        const hasSubCategories = categorizedFiles[categoryKey].some(file => subCategoryMap[file]);
+        
+        let items: DefaultTheme.SidebarItem[];
+        
+        if (hasSubCategories) {
+          // 按子分类分组
+          const subCategoryGroups: Record<string, string[]> = {};
+          const ungroupedFiles: string[] = [];
+          
+          categorizedFiles[categoryKey].forEach(file => {
+            const subCategory = subCategoryMap[file];
+            if (subCategory) {
+              if (!subCategoryGroups[subCategory]) {
+                subCategoryGroups[subCategory] = [];
+              }
+              subCategoryGroups[subCategory].push(file);
+            } else {
+              ungroupedFiles.push(file);
             }
-            
-            // 一般文件
-            const fileName = file.replace('.md', '');
-            const displayName = fileName
-              .split('/')
-              .pop()
-              ?.replace(/^./, str => str.toUpperCase()) || fileName;
-            
-            // 生成正确的链接
-            const link = filePathToLink(file);
-            
-            return {
-              text: displayName,
-              link: link
-            };
           });
+          
+          items = [];
+          
+          // 按字母顺序排序子分类
+          Object.keys(subCategoryGroups)
+            .sort()
+            .forEach(subCategory => {
+              const subItems = subCategoryGroups[subCategory]
+                .sort()
+                .map(file => fileToSidebarItem(file));
+              
+              items.push({
+                text: subCategory,
+                collapsed: false,
+                items: subItems
+              });
+            });
+          
+          // 添加未分组的文件
+          if (ungroupedFiles.length > 0) {
+            const ungroupedItems = ungroupedFiles
+              .sort()
+              .map(file => fileToSidebarItem(file));
+            items.push(...ungroupedItems);
+          }
+        } else {
+          // 没有子分类，直接排序
+          items = categorizedFiles[categoryKey]
+            .sort()
+            .map(file => fileToSidebarItem(file));
+        }
+        
+        // 添加图标（如果有）
+        const categoryText = categoryInfo.icon 
+          ? `${categoryInfo.icon} ${categoryInfo.text}`
+          : categoryInfo.text;
         
         sidebar.push({
-          text: categoryInfo.text,
+          text: categoryText,
           collapsed: false,
           items
         });
       }
     });
   
-  // 如果有未分组的文件，添加到"全部文档"分组
+  // 如果有未分组的文件，添加到"未分组"分组
   if (uncategorizedFiles.length > 0) {
-    const allDocsItems: DefaultTheme.SidebarItem[] = uncategorizedFiles
-      .map(file => {
-        // 处理特殊导航项
-        if (specialNavItems[file]) {
-          return {
-            text: specialNavItems[file].text,
-            link: specialNavItems[file].link
-          };
-        }
-        
-        // 一般文件
-        const fileName = file.replace('.md', '');
-        const displayName = fileName
-          .split('/')
-          .pop()
-          ?.replace(/^./, str => str.toUpperCase()) || fileName;
-        
-        // 生成正确的链接
-        const link = filePathToLink(file);
-        
-        return {
-          text: displayName,
-          link: link
-        };
-      });
+    const uncategorizedItems = uncategorizedFiles.map(file => fileToSidebarItem(file));
     
     sidebar.push({
-      text: '其他文档',
+      text: '未分组',
       collapsed: false,
-      items: allDocsItems
+      items: uncategorizedItems
     });
   }
   
@@ -219,9 +335,10 @@ export function getAllFiles(): string[] {
   const pythonFiles: string[] = [];
   
   // 扫描各个目录
+  // scanDirectory 返回的路径已经是相对于 docsDir 的，所以已经包含了目录名（如 notion/）
   try {
     if (statSync(notionDir).isDirectory()) {
-      notionFiles.push(...scanDirectory(notionDir, docsDir).map(file => `notion/${file}`));
+      notionFiles.push(...scanDirectory(notionDir, docsDir));
     }
   } catch (e) {
     // 目录不存在，跳过
@@ -229,7 +346,7 @@ export function getAllFiles(): string[] {
   
   try {
     if (statSync(recordsDir).isDirectory()) {
-      recordsFiles.push(...scanDirectory(recordsDir, docsDir).map(file => `records/${file}`));
+      recordsFiles.push(...scanDirectory(recordsDir, docsDir));
     }
   } catch (e) {
     // 目录不存在，跳过
@@ -237,7 +354,7 @@ export function getAllFiles(): string[] {
   
   try {
     if (statSync(pythonDir).isDirectory()) {
-      pythonFiles.push(...scanDirectory(pythonDir, docsDir).map(file => `python/${file}`));
+      pythonFiles.push(...scanDirectory(pythonDir, docsDir));
     }
   } catch (e) {
     // 目录不存在，跳过

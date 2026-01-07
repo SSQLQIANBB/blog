@@ -5,9 +5,7 @@ layout: home
 hero:
   name: "牧风夕大佬"
   text: "个人博客"
-  tagline: 前端工程师的个人技术博客，记录学习和工作中的点点滴滴
-  image:
-    src: /pig.svg
+  tagline: 前端工程师的个人技术博客，记录学习和工作中的点滴
   actions:
     - theme: brand
       text: 开始阅读
@@ -48,14 +46,3 @@ features:
     link: /notion/工作记录
     linkText: 查看更多
 ---
-
-<script setup>
-import { onMounted } from 'vue'
-
-onMounted(() => {
-  const heroImage = document.querySelector('.VPHeroImage img')
-  if (heroImage) {
-    heroImage.classList.add('fade-in')
-  }
-})
-</script>

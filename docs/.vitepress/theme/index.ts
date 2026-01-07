@@ -3,6 +3,8 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import Layout from './layout.vue'; // 自定义layout组件
 import './style.css'
+import './custom.css'
+import './templates.css' // 引入样式模板
 
 export default {
   extends: DefaultTheme,

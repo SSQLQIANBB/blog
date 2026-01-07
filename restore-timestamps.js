@@ -1,12 +1,13 @@
-const { readFileSync, statSync, utimesSync, existsSync } = require('fs');
+const { readFileSync, statSync, utimesSync, existsSync, writeFileSync } = require('fs');
 const { join } = require('path');
 
 /**
  * 从 elog.cache.json 恢复文件的时间戳
- * 这样可以避免 elog 同步时更新所有文件的修改时间
+ * 只更新被 elog 修改过的文件，保持未修改文件的原始时间戳
  */
 function restoreFileTimestamps() {
   const cachePath = join(__dirname, 'elog.cache.json');
+  const timestampCachePath = join(__dirname, '.timestamp-cache.json');
   const docsDir = join(__dirname, 'docs', 'notion');
   
   try {
@@ -16,7 +17,7 @@ function restoreFileTimestamps() {
       return;
     }
     
-    // 读取缓存文件
+    // 读取 elog 缓存文件
     const cacheContent = readFileSync(cachePath, 'utf-8');
     const cache = JSON.parse(cacheContent);
     
@@ -25,9 +26,22 @@ function restoreFileTimestamps() {
       return;
     }
     
+    // 读取时间戳缓存（记录每个文件的原始修改时间）
+    let timestampCache = {};
+    if (existsSync(timestampCachePath)) {
+      try {
+        const timestampCacheContent = readFileSync(timestampCachePath, 'utf-8');
+        timestampCache = JSON.parse(timestampCacheContent);
+      } catch (e) {
+        console.log('⚠️  读取时间戳缓存失败，将创建新的缓存');
+      }
+    }
+    
     let restoredCount = 0;
     let skippedCount = 0;
+    let unchangedCount = 0;
     let errorCount = 0;
+    const newTimestampCache = {};
     
     // 遍历所有文档
     cache.docs.forEach(doc => {
@@ -47,13 +61,18 @@ function restoreFileTimestamps() {
           return;
         }
         
-        // 获取更新时间
+        // 获取文件的当前修改时间
+        const fileStats = statSync(filePath);
+        const currentMtime = fileStats.mtime.getTime();
+        
+        // 获取缓存中的原始修改时间
+        const cachedMtime = timestampCache[fileName] || null;
+        
+        // 获取 Notion 中的更新时间
         let updateTime;
         if (doc.updated) {
-          // 使用时间戳（毫秒）
           updateTime = new Date(doc.updated);
         } else if (doc.properties?.updated) {
-          // 使用字符串格式的时间
           updateTime = new Date(doc.properties.updated);
         } else if (doc.properties?.['上次更新时间']) {
           updateTime = new Date(doc.properties['上次更新时间']);
@@ -68,9 +87,31 @@ function restoreFileTimestamps() {
           return;
         }
         
-        // 恢复文件时间戳（修改时间和访问时间都设置为更新时间）
-        utimesSync(filePath, updateTime, updateTime);
-        restoredCount++;
+        const updateTimeMs = updateTime.getTime();
+        
+        // 判断文件是否被 elog 更新
+        // 如果文件的修改时间比 Notion 更新时间新很多（超过5秒），说明文件被 elog 更新了
+        // 或者如果缓存中没有记录，也认为文件可能被更新了
+        const timeDiff = currentMtime - updateTimeMs;
+        const isFileUpdated = !cachedMtime || Math.abs(timeDiff) > 5000;
+        
+        if (isFileUpdated) {
+          // 文件被更新了，恢复为 Notion 的更新时间
+          utimesSync(filePath, updateTime, updateTime);
+          newTimestampCache[fileName] = updateTimeMs;
+          restoredCount++;
+        } else {
+          // 文件未被更新，保持原有时间戳
+          if (cachedMtime) {
+            const originalTime = new Date(cachedMtime);
+            utimesSync(filePath, originalTime, originalTime);
+            newTimestampCache[fileName] = cachedMtime;
+          } else {
+            // 没有缓存，使用当前时间作为原始时间
+            newTimestampCache[fileName] = currentMtime;
+          }
+          unchangedCount++;
+        }
         
       } catch (error) {
         errorCount++;
@@ -78,9 +119,17 @@ function restoreFileTimestamps() {
       }
     });
     
-    if (restoredCount > 0 || skippedCount > 0 || errorCount > 0) {
+    // 保存时间戳缓存
+    try {
+      writeFileSync(timestampCachePath, JSON.stringify(newTimestampCache, null, 2), 'utf-8');
+    } catch (e) {
+      console.warn('⚠️  保存时间戳缓存失败:', e.message);
+    }
+    
+    if (restoredCount > 0 || unchangedCount > 0 || skippedCount > 0 || errorCount > 0) {
       console.log(`✅ 时间戳恢复完成:`);
-      console.log(`   - 已恢复: ${restoredCount} 个文件`);
+      console.log(`   - 已恢复: ${restoredCount} 个更新文件的时间戳`);
+      console.log(`   - 保持原样: ${unchangedCount} 个未修改文件`);
       if (skippedCount > 0) {
         console.log(`   - 跳过: ${skippedCount} 个文件（文件不存在或缺少时间信息）`);
       }
