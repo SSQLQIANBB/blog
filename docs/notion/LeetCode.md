@@ -667,6 +667,52 @@ int dfs(TreeNode root) {
 }
 ```
 
+> 后序: 访问当前节点时，只需要记录的右边节点有没有被访问，即上次出栈的节点是不是右侧节点；
+
+```javascript
+// 左右中 + stack
+const postorderTraversal = (root) => {
+  if (!root) return []
+
+  const stack = [];
+  const res = [];
+
+  let node = root;
+  let prev = null
+
+  while (stack.length || node) {
+    while (node) {
+      stack.push(node);
+
+      node = node.left;
+    }
+
+    node = stack.at(-1);
+
+    // 【1，2，3】输出：【2，3，1】
+    // 执行过程中左右按顺序压入栈。左边节点到达顶点，
+    // 将左侧节点值放入result, node置为空，防止走入 node left的循环；
+    // 左侧节点出栈；
+    // 访问右侧节点；右侧节点入栈；
+    // 到达右侧顶点；右侧值放入result,
+    // 节点出栈，记录右侧出栈节点，防止再次进入右侧节点；
+
+    if (!node.right || node.right === prev) {
+      res.push(node.val);
+      stack.pop();
+
+      prev = node;
+
+      node = null;
+    } else {
+      node = node.right
+    }
+  }
+
+  return res;
+}
+```
+
 
 **必刷题**：
 
