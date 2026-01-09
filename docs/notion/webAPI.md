@@ -1,0 +1,3 @@
+- **requestAnimationFrame**
+- **requestIdleCallback**
+- **Promise**
