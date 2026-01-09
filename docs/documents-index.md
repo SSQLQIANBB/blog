@@ -11,7 +11,7 @@
 
 ### JavaScript 相关
 - [JavaScript](notion/JavaScript.md)
-- [let, var](notion/let, var.md)
+- [let, var](notion/let&var.md)
 - [this指向、super关键字](notion/this指向、super关键字.md)
 - [作用域和作用域链](notion/作用域和作用域链.md)
 - [原型和原型链](notion/原型和原型链.md)
@@ -29,7 +29,7 @@
 
 ### Vue 相关
 - [vue](notion/vue.md)
-- [vue Router](notion/vue Router.md)
+- [vue Router](notion/vueRouter.md)
 - [vuex中在mutation中使用异步](notion/vuex中在mutation中使用异步.md)
 - [data为什么是函数问题](notion/data为什么是函数问题.md)
 - [父组件渲染子组件内容](notion/父组件渲染子组件内容.md)
@@ -52,9 +52,9 @@
 - [babel](notion/babel.md)
 - [eslint](notion/eslint.md)
 - [prettier](notion/prettier.md)
-- [npm & yarn & pnpm](notion/npm & yarn & pnpm.md)
+- [npm & yarn & pnpm](notion/npm&yarn&pnpm.md)
 - [工程化&模块化](notion/工程化&模块化.md)
-- [Commonjs和ES Module](notion/Commonjs和ES Module.md)
+- [Commonjs和ES Module](notion/Commonjs和ESModule.md)
 - [loader](notion/loader.md)
 - [tapable](notion/tapable.md)
 - [micro-app](notion/micro-app.md)
@@ -68,9 +68,9 @@
 - [web前端监控](notion/web前端监控.md)
 
 ### Web API 和浏览器相关
-- [web API](notion/web API.md)
-- [web component](notion/web component.md)
-- [indexDB & webSQL](notion/indexDB & webSQL.md)
+- [web API](notion/webAPI.md)
+- [web component](notion/webComponent.md)
+- [indexDB & webSQL](notion/indexDB&webSQL.md)
 - [worker](notion/worker.md)
 - [socket](notion/socket.md)
 - [WebRTC](notion/WebRTC.md)
@@ -129,4 +129,5 @@
 
 ## 版本更新记录
 
-- [basic & extra](notion/basic & extra.md)
+
+- [basic & extra](notion/basic&extra.md)
