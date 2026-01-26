@@ -1,3 +1,6 @@
+
+![image.png](/notion/images/f0e30070fe431c9c9785ff4e9d91b4bd.png)
+
 > web性能是对网站或应用程序的客观度量和用户的体验，有以下主要方面
 
 ![zp4wrjatnb.png](/notion/images/359a370e0d302d0f316b2753fb4e178a.png)
