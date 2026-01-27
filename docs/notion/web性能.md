@@ -355,11 +355,249 @@ FP与FCP这两个指标之间的主要区别是：
 - FP是当浏览器开始绘制内容到屏幕上的时候，只要在视觉上开始发生变化，无论是什么内容触发的视觉变化，在这一刻，这个时间点，叫做FP。
 - FCP指的是浏览器首次绘制来自DOM的内容。例如：文本，图片，SVG，canvas元素等，这个时间点叫FCP。
 
-dom:
+### Network面板指标：
 
 
-js:
+![image.png](/notion/images/73da8d30ebb392e5362de332603aaa87.png)
+
+- **加入队列**。浏览器会在连接开始之前以及在以下情况下将请求加入队列：
+    - 还有优先级更高的请求。请求优先级由资源类型以及其在文档中的位置等因素决定。如需了解详情，请参阅 `fetchpriority` 指南的[资源优先级部分](https://web.dev/articles/fetch-priority?hl=zh-cn#resource-priority)。
+    - 此来源已有 6 个 TCP 连接处于打开状态，这是上限。（仅适用于 HTTP/1.0 和 HTTP/1.1。）
+    - 浏览器正在磁盘缓存中暂时分配空间。
+- **已暂停**。连接开始后，请求可能会因**队列**中所述的任何原因而暂停。
+- **DNS 查询**。浏览器正在解析请求的 IP 地址。
+- **初始连接**。浏览器正在建立连接，包括 TCP 握手或重试以及协商 SSL。
+- **代理协商**。浏览器正在与[代理服务器](https://en.wikipedia.org/wiki/Proxy_server)协商请求。
+- **已发送请求**。正在发送请求。
+- **ServiceWorker 准备工作**。浏览器正在启动服务工件。
+- **向 ServiceWorker 发出请求**。请求正在发送到服务工件。
+- **等待中 (TTFB)**。浏览器正在等待响应的第一个字节。TTFB 是“Time To First Byte”（收到第一个字节的时间）的缩写。此时间包括 1 次往返延迟时间和服务器准备响应所需的时间。
+- **内容下载**。浏览器会直接从网络或 Service Worker 接收响应。此值是读取响应正文所花费的总时间。大于预期值可能表示网络速度缓慢，或者浏览器正忙于执行其他工作，导致延迟读取响应。
+
+# Resource Scheduling（资源调度）优化记录笔记
 
 
-加载
+## 一、问题背景
 
+
+在使用 `FormData.append('file', file)` 进行文件上传时（文件大小约 20KB），通过 Chrome DevTools → Network → Timing 面板观察到：
+
+- **Resource Scheduling → Queueing 时间高达 1s ~ 1.7s**；
+- `Request sent / Waiting (TTFB) / Content Download` 均非常快；
+- 后端接口耗时 < 200ms；
+- 前端无并发请求、无 loading 阻塞。
+
+结论：**性能瓶颈不在网络或后端，而在浏览器资源调度阶段。**
+
+
+---
+
+
+## 二、Resource Scheduling 是什么
+
+
+Resource Scheduling（资源调度）发生在：
+
+> JS 已调用 fetch / xhr，但浏览器尚未真正开始发送网络请求之前。
+
+该阶段由 Chrome Network Service 接管，用于：
+
+- 请求优先级评估
+- 上传管道（Upload Pipeline）初始化
+- IO / 线程 / socket 资源分配
+- File 安全校验
+
+表现形式：
+
+
+```plain text
+JS fetch
+  ↓
+Request 入队（Queueing）
+  ↓
+满足调度条件后
+  ↓
+Connection Start
+```
+
+
+---
+
+
+## 三、Chrome 官方对 Queueing 的解释（摘录）
+
+
+请求在以下情况下会被加入队列：
+
+- 有更高优先级的请求存在
+- 同一来源 TCP 连接数达到上限（HTTP/1.1 为 6）
+- 浏览器正在为请求分配磁盘缓存空间
+- 请求为 File / multipart 类型，需要额外准备工作
+
+📌 **Queueing 不等于网络慢，也不等于 CPU 忙。**
+
+
+---
+
+
+## 四、现象与实验结论
+
+
+### 1️⃣ 只保留最小上传代码（无效果）
+
+
+```typescript
+const formData = new FormData();
+formData.append('file', rawFile);
+await importWhitelist(formData);
+```
+
+- Queueing 仍然约 1s
+- 排除 UI、并发请求、业务逻辑影响
+
+---
+
+
+### 2️⃣ 同一文件多次上传
+
+
+| 次数    | Queueing 时间 |
+| ----- | ----------- |
+| 第 1 次 | ~1000ms     |
+| 第 2 次 | <100ms      |
+
+
+📌 结论：**首次 File 上传存在一次性初始化成本**。
+
+
+---
+
+
+### 3️⃣ File 对象的本质
+
+- `File` 继承自 `Blob`
+- 仅包含元数据（name / size / type / lastModified）
+- 实际文件字节仍在磁盘
+- 浏览器持有的是 **安全句柄（handle）**
+
+上传时：
+
+1. 在发送 HTTP 请求阶段才开始读取磁盘；
+2. 以流式（streaming）方式分块读取；
+3. 边读边发，不整体加载进内存；
+4. 不缓存文件内容。
+
+---
+
+
+### 4️⃣ 关键对比实验（决定性证据）
+
+
+### 实验代码
+
+
+```typescript
+const arrayBuffer = await file.arrayBuffer();
+
+const f = new File([arrayBuffer], file.name, { type: file.type });
+const formData = new FormData();
+formData.append('file', f);
+
+await importWhitelist(formData);
+```
+
+
+### 实验结果
+
+
+![image.png](/notion/images/0d655b84c0f608af51137fa3b021cfb3.png)
+
+- Resource Scheduling：**1–2ms**
+- Queueing 几乎消失
+
+✅ 说明：
+
+> 真正耗时的是：Chrome 为“磁盘文件句柄”建立上传管道与安全校验，而不是网络发送本身。
+
+---
+
+
+## 五、根本原因总结
+
+
+当 `FormData.append('file', file)` 且 `file` 来源于 `<input type="file">`：
+
+
+Chrome 在 Resource Scheduling 阶段需要：
+
+1. 初始化 Upload Pipeline（仅首次）
+2. 为磁盘 File 建立流式读取通道
+3. 分配 IO 线程 / backpressure 机制
+4. 执行文件来源与权限安全校验
+
+📌 这些工作：
+
+- 在 C++ 网络栈中完成
+- 不占用 JS 主线程
+- 不受文件大小影响
+- Performance 面板无法定位到具体帧
+
+---
+
+
+## 六、已验证有效的优化手段
+
+
+### ✅ 方案 1：上传预热（推荐）
+
+- 在弹窗打开或页面空闲时，发送一次“假上传”
+- 提前触发 Upload Pipeline 初始化
+
+效果：
+
+- 首次 Queueing 从 ~1000ms → <200ms
+
+---
+
+
+### ✅ 方案 2：文件选择即 append
+
+- 在 `onChange` 时构建 `FormData`
+- 将 Queueing 前移到用户选文件阶段
+
+效果：
+
+- 点击“保存”时几乎无等待
+
+---
+
+
+### ⚠️ 方案 3：内存化文件（ArrayBuffer）
+
+- 将 File 转为 ArrayBuffer 再重新构造 File
+- 绕过磁盘文件句柄上传路径
+
+优点：
+
+- Queueing ≈ 0
+
+代价：
+
+- 占用内存
+- 不适合大文件
+
+---
+
+
+## 七、结论性说明
+
+> Resource Scheduling 阶段的耗时属于浏览器对文件上传的安全与资源调度机制，首次上传本地文件时需要初始化上传管道和校验文件句柄，因此会出现约 1 秒的排队时间。该行为与文件大小和接口性能无关，属于浏览器层面的正常设计。通过上传预热或提前构建 FormData，可显著降低用户感知延迟。
+
+---
+
+
+## 八、最终结论
+
+- ❌ 无法从根本“删除” Resource Scheduling
+- ✅ 可以通过 **提前触发 / 转移时机 / 绕过磁盘句柄** 来优化体验
+- 📌 当前现象符合 Chrome 内核预期行为，并非代码缺陷
