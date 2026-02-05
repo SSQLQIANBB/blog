@@ -1,1 +1,0 @@
-import{_ as t,c as e,o}from"./app.nC0fDSkh.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"notion/K8S.md","filePath":"notion/K8S.md","lastUpdated":1770269409000}'),a={name:"notion/K8S.md"};function n(r,s,c,i,d,p){return o(),e("div")}const f=t(a,[["render",n]]);export{m as __pageData,f as default};
