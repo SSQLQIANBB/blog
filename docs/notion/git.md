@@ -232,6 +232,65 @@ git stash pop    # 恢复
 ```
 
 
+可以用 `git stash push` 后面直接跟文件路径，只缓存指定文件：
+
+
+```bash
+git stash push -m "缓存指定文件" -- src/pages/Login/index.vue
+```
+
+
+多个文件：
+
+
+```bash
+git stash push -m "缓存登录相关文件" -- src/pages/Login/index.vue src/api/login.js
+```
+
+
+指定目录：
+
+
+```bash
+git stash push -m "缓存登录模块" -- src/pages/Login
+```
+
+
+查看：
+
+
+```bash
+git stash list
+```
+
+
+恢复：
+
+
+```bash
+git stash apply stash@{0}
+```
+
+
+恢复并删除 stash：
+
+
+```bash
+git stash pop stash@{0}
+```
+
+
+如果指定文件是**未追踪文件**，需要加 `-u`：
+
+
+```bash
+git stash push -u -m "缓存新文件" -- src/pages/Login/newFile.vue
+```
+
+
+注意 `--` 的作用是告诉 Git：后面的内容是文件路径，避免文件名和分支名、参数名冲突。
+
+
 ---
 
 

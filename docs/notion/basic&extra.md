@@ -23,6 +23,12 @@
     ![Untitled.png](/notion/images/ba4fa6f9c8382191140c2edc1770c4ab.png)
 
 
+### Buffer和stream
+
+
+Buffer 是 Node.js 中用于存储二进制数据的内存结构，而 Stream 是一种按块处理数据的机制。Stream 内部处理的数据块通常就是 Buffer，因此 Stream 更适合处理大数据或 IO 场景，可以避免一次性占用大量内存。
+
+
 ### **blob(只读)、arrayBuffer、buffer（node）**
 
     - **用例**：Blob 通常用于存储二进制数据，该数据可能不是 JavaScript 本地格式，例如图像或视频。ArrayBuffer 通常用于表示原始字节序列，并且可以用于以比传统字符串更容易操作的格式存储数据。另一方面，Buffer 通常用于在程序的不同部分之间传输数据，例如网络协议或文件系统。
