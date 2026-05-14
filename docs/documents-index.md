@@ -1,6 +1,17 @@
+---
+pageClass: docs-index-page
+---
+
 # 文档索引
 
-本文档整理了项目中的所有文档文件，并按照类别进行分类，方便查阅。
+这里按常用阅读路径整理文档。需要完整侧边栏视图时，可以直接进入 [全部文档](all-docs.md)。
+
+<div class="doc-index-quick">
+  <a href="/blog/all-docs">全部文档</a>
+  <a href="/blog/notion/vue">前端入口</a>
+  <a href="/blog/notion/webpack">工程化入口</a>
+  <a href="/blog/notion/问题记录">问题记录</a>
+</div>
 
 ## 首页和关于页面
 

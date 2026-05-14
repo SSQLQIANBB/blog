@@ -4,45 +4,51 @@ layout: home
 
 hero:
   name: "牧风夕大佬"
-  text: "个人博客"
-  tagline: 前端工程师的个人技术博客，记录学习和工作中的点滴
+  text: "工程笔记与问题档案"
+  tagline: 按主题整理前端、工程化、后端与计算机基础，把踩坑记录沉淀成可检索的工作台。
+  image:
+    src: /pig.svg
+    alt: 牧风夕大佬
   actions:
     - theme: brand
-      text: 开始阅读
-      link: /notion/vue
+      text: 浏览文档
+      link: /all-docs
     - theme: alt
-      text: 关于我
-      link: /about
+      text: 文档索引
+      link: /documents-index
+    - theme: alt
+      text: 最新记录
+      link: /notion/问题记录
 
 features:
   - icon: 📘
     title: 前端技术
-    details: Vue、React、HTML、CSS、JavaScript、TypeScript等前端技术分享
+    details: Vue、React、JavaScript、TypeScript 与浏览器 API 的系统笔记。
     link: /notion/vue
-    linkText: 查看更多
+    linkText: 进入前端
   - icon: ⚙️
     title: 工程化
-    details: Webpack、Vite、Babel、ESLint、Prettier等工程化工具使用经验
+    details: Webpack、Vite、Babel、ESLint、Prettier 与模块化实践。
     link: /notion/webpack
-    linkText: 查看更多
+    linkText: 查看工程化
   - icon: 🔧
     title: 后端技术
-    details: Node.js、Python等后端技术实践
+    details: Node.js、Python、服务部署与接口相关问题记录。
     link: /notion/node
-    linkText: 查看更多
+    linkText: 进入后端
   - icon: 💡
     title: 计算机基础
-    details: 计算机网络、设计模式等基础知识总结
+    details: 网络、缓存、设计模式、算法与面试基础知识。
     link: /notion/计算机网络
-    linkText: 查看更多
+    linkText: 夯实基础
   - icon: 🛠️
     title: 开发工具
-    details: Git、Docker等开发工具使用技巧
+    details: Git、Linux、脚手架和日常效率工具的使用经验。
     link: /tools/
-    linkText: 查看更多
+    linkText: 打开工具箱
   - icon: 📝
     title: 工作记录
-    details: 工作中的问题解决和经验总结
-    link: /notion/工作记录
-    linkText: 查看更多
+    details: 真实项目中的问题排查、接口细节和经验复盘。
+    link: /notion/问题记录
+    linkText: 查看记录
 ---

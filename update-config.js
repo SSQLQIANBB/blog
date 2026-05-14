@@ -1,5 +1,6 @@
-const { readFileSync, writeFileSync } = require('fs');
+const { existsSync, readFileSync } = require('fs');
 const { join } = require('path');
+const { categoryRules, defaultCategory } = require('./docs/.vitepress/category-rules');
 
 // 扫描目录并获取所有md文件
 function scanDirectory(dir, baseDir = dir) {
@@ -25,14 +26,47 @@ function scanDirectory(dir, baseDir = dir) {
 
 // 生成文件列表
 function generateFileList() {
-  const notionFiles = scanDirectory(join(__dirname, 'docs/notion')).map(file => `notion/${file}`);
-  const recordsFiles = scanDirectory(join(__dirname, 'docs/records')).map(file => `records/${file}`);
+  const scanDocsDir = dir => {
+    const fullDir = join(__dirname, `docs/${dir}`);
+    return existsSync(fullDir) ? scanDirectory(fullDir).map(file => `${dir}/${file}`) : [];
+  };
   
-  return [...notionFiles, ...recordsFiles];
+  return [...scanDocsDir('notion'), ...scanDocsDir('records'), ...scanDocsDir('python')];
 }
 
-// 检查未分组的文件
-function checkUncategorizedFiles() {
+function normalizeTitle(fileName) {
+  const title = (fileName.split('/').pop() || fileName).replace(/\.md$/, '');
+
+  return title
+    .toLowerCase()
+    .replace(/[\s_&、，,：:（）()[\]【】"'`]+/g, '');
+}
+
+function findCategoryRule(fileName) {
+  const normalizedTitle = normalizeTitle(fileName);
+  return categoryRules.find(rule =>
+    rule.keywords.some(keyword =>
+      normalizedTitle.includes(keyword.toLowerCase().replace(/[\s_&、，,：:（）()[\]【】"'`]+/g, ''))
+    )
+  );
+}
+
+function getCategoryForFile(fileName, categoryMapContent) {
+  const explicitMatch = categoryMapContent.match(new RegExp(`'${fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}':\\s*'([^']+)'`));
+  if (explicitMatch) {
+    return { category: explicitMatch[1], source: 'manual' };
+  }
+
+  const rule = findCategoryRule(fileName);
+  if (rule) {
+    return { category: rule.category, subCategory: rule.subCategory, source: 'auto' };
+  }
+
+  return { category: defaultCategory, source: 'default' };
+}
+
+// 检查并预览自动分组结果
+function checkCategories() {
   const files = generateFileList();
   
   // 读取 category-map.ts 以检查哪些文件已分组
@@ -45,24 +79,39 @@ function checkUncategorizedFiles() {
     return;
   }
   
-  // 检查未分组的文件
   const sortedFiles = [...files].sort();
-  const uncategorizedFiles = sortedFiles.filter(file => {
-    // 检查文件是否在 fileToCategoryMap 中
-    return !categoryMapContent.includes(`'${file}':`);
+  const autoCategorizedFiles = [];
+  const defaultCategorizedFiles = [];
+
+  sortedFiles.forEach(file => {
+    const result = getCategoryForFile(file, categoryMapContent);
+    if (result.source === 'auto') {
+      autoCategorizedFiles.push({ file, ...result });
+    } else if (result.source === 'default') {
+      defaultCategorizedFiles.push({ file, ...result });
+    }
   });
   
   console.log(`✅ 扫描完成，共找到 ${files.length} 个文件`);
-  if (uncategorizedFiles.length > 0) {
-    console.log(`\n📝 提示：发现 ${uncategorizedFiles.length} 个未分组的文件，它们将自动显示在"其他文档"分组中：`);
-    uncategorizedFiles.forEach(file => {
+
+  if (autoCategorizedFiles.length > 0) {
+    console.log(`\n🤖 自动归类 ${autoCategorizedFiles.length} 个文件：`);
+    autoCategorizedFiles.forEach(({ file, category, subCategory }) => {
+      const subCategoryText = subCategory ? ` / ${subCategory}` : '';
+      console.log(`   - ${file} -> ${category}${subCategoryText}`);
+    });
+  }
+
+  if (defaultCategorizedFiles.length > 0) {
+    console.log(`\n📝 ${defaultCategorizedFiles.length} 个文件未命中规则，将显示在"${defaultCategory}"分组中：`);
+    defaultCategorizedFiles.forEach(({ file }) => {
       console.log(`   - ${file}`);
     });
-    console.log(`\n💡 如需为这些文件添加分组，请在 docs/.vitepress/category-map.ts 的 fileToCategoryMap 中添加映射。`);
+    console.log(`\n💡 如需调整自动归类，请修改 docs/.vitepress/category-rules.js；如需固定归类，请在 docs/.vitepress/category-map.ts 的 fileToCategoryMap 中添加映射。`);
   } else {
-    console.log(`\n✅ 所有文件都已正确分组！`);
+    console.log(`\n✅ 所有文件都已完成手动或自动归类。`);
   }
 }
 
 // 执行检查
-checkUncategorizedFiles();
+checkCategories();

@@ -1,22 +1,36 @@
 import { DefaultTheme } from 'vitepress';
 import { readdirSync, statSync } from 'fs';
 import { join, relative, extname } from 'path';
-import { categoryMap, fileToCategoryMap } from './category-map';
+import { categoryMap, fileToCategoryMap, subCategoryMap, categoryRules, defaultCategory } from './category-map';
 import { specialNavItems } from './nav-items';
 
-// 动态导入子分类映射（避免循环依赖）
-let subCategoryMap: Record<string, string> = {};
-try {
-  const categoryMapModule = require('./category-map');
-  subCategoryMap = categoryMapModule.subCategoryMap || {};
-} catch (e) {
-  // 如果导入失败，使用空对象
+function normalizeTitle(fileName: string): string {
+  const title = fileName
+    .split('/')
+    .pop()
+    ?.replace(/\.md$/, '') || fileName;
+
+  return title
+    .toLowerCase()
+    .replace(/[\s_&、，,：:（）()[\]【】"'`]+/g, '');
+}
+
+function findCategoryRule(fileName: string) {
+  const normalizedTitle = normalizeTitle(fileName);
+  return categoryRules.find(rule =>
+    rule.keywords.some(keyword =>
+      normalizedTitle.includes(keyword.toLowerCase().replace(/[\s_&、，,：:（）()[\]【】"'`]+/g, ''))
+    )
+  );
 }
 
 // 获取文件对应的分类
 export function getCategoryForFile(fileName: string): string | null {
-  
-  return fileToCategoryMap[fileName] || null;
+  return fileToCategoryMap[fileName] || findCategoryRule(fileName)?.category || defaultCategory || null;
+}
+
+function getSubCategoryForFile(fileName: string): string | null {
+  return subCategoryMap[fileName] || findCategoryRule(fileName)?.subCategory || null;
 }
 
 // 将文件路径转换为 VitePress 链接
@@ -82,8 +96,7 @@ export function generateSidebarByCategory(files: string[], category: string): De
   }
   
   // 检查是否有子分类映射
-  const { subCategoryMap } = require('./category-map');
-  const hasSubCategories = categoryFiles.some(file => subCategoryMap[file]);
+  const hasSubCategories = categoryFiles.some(file => getSubCategoryForFile(file));
   
   if (hasSubCategories) {
     // 按子分类分组
@@ -91,7 +104,7 @@ export function generateSidebarByCategory(files: string[], category: string): De
     const ungroupedFiles: string[] = [];
     
     categoryFiles.forEach(file => {
-      const subCategory = subCategoryMap[file];
+      const subCategory = getSubCategoryForFile(file);
       if (subCategory) {
         if (!subCategoryGroups[subCategory]) {
           subCategoryGroups[subCategory] = [];
@@ -165,7 +178,7 @@ export function generateAllDocsSidebar(files: string[]): DefaultTheme.SidebarIte
     .forEach(([categoryKey, categoryInfo]) => {
       if (categorizedFiles[categoryKey]) {
         // 检查是否有子分类
-        const hasSubCategories = categorizedFiles[categoryKey].some(file => subCategoryMap[file]);
+        const hasSubCategories = categorizedFiles[categoryKey].some(file => getSubCategoryForFile(file));
         
         let items: DefaultTheme.SidebarItem[];
         
@@ -175,7 +188,7 @@ export function generateAllDocsSidebar(files: string[]): DefaultTheme.SidebarIte
           const ungroupedFiles: string[] = [];
           
           categorizedFiles[categoryKey].forEach(file => {
-            const subCategory = subCategoryMap[file];
+            const subCategory = getSubCategoryForFile(file);
             if (subCategory) {
               if (!subCategoryGroups[subCategory]) {
                 subCategoryGroups[subCategory] = [];

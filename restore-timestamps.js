@@ -1,5 +1,30 @@
-const { readFileSync, statSync, utimesSync, existsSync, writeFileSync } = require('fs');
-const { join } = require('path');
+const { readFileSync, utimesSync, existsSync, writeFileSync } = require('fs');
+const { execFileSync } = require('child_process');
+const { join, relative } = require('path');
+
+function isGitTracked(filePath) {
+  try {
+    execFileSync('git', ['ls-files', '--error-unmatch', filePath], {
+      cwd: __dirname,
+      stdio: 'ignore',
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function hasGitContentChanges(filePath) {
+  try {
+    execFileSync('git', ['diff', '--quiet', '--', filePath], {
+      cwd: __dirname,
+      stdio: 'ignore',
+    });
+    return false;
+  } catch (error) {
+    return true;
+  }
+}
 
 /**
  * 从 elog.cache.json 恢复文件的时间戳
@@ -54,6 +79,7 @@ function restoreFileTimestamps() {
         }
         
         const filePath = join(docsDir, `${fileName}.md`);
+        const cacheKey = fileName;
         
         // 检查文件是否存在
         if (!existsSync(filePath)) {
@@ -61,12 +87,8 @@ function restoreFileTimestamps() {
           return;
         }
         
-        // 获取文件的当前修改时间
-        const fileStats = statSync(filePath);
-        const currentMtime = fileStats.mtime.getTime();
-        
         // 获取缓存中的原始修改时间
-        const cachedMtime = timestampCache[fileName] || null;
+        const cachedMtime = timestampCache[cacheKey] || null;
         
         // 获取 Notion 中的更新时间
         let updateTime;
@@ -89,27 +111,21 @@ function restoreFileTimestamps() {
         
         const updateTimeMs = updateTime.getTime();
         
-        // 判断文件是否被 elog 更新
-        // 如果文件的修改时间比 Notion 更新时间新很多（超过5秒），说明文件被 elog 更新了
-        // 或者如果缓存中没有记录，也认为文件可能被更新了
-        const timeDiff = currentMtime - updateTimeMs;
-        const isFileUpdated = !cachedMtime || Math.abs(timeDiff) > 5000;
-        
-        if (isFileUpdated) {
-          // 文件被更新了，恢复为 Notion 的更新时间
+        const relativeFilePath = relative(__dirname, filePath).replace(/\\/g, '/');
+        const isTracked = isGitTracked(relativeFilePath);
+        const hasContentChanges = isTracked ? hasGitContentChanges(relativeFilePath) : true;
+        const shouldUseNotionTime = !cachedMtime || hasContentChanges;
+
+        if (shouldUseNotionTime) {
+          // 新文件或内容确实变化时，使用 Notion 的更新时间
           utimesSync(filePath, updateTime, updateTime);
-          newTimestampCache[fileName] = updateTimeMs;
+          newTimestampCache[cacheKey] = updateTimeMs;
           restoredCount++;
         } else {
-          // 文件未被更新，保持原有时间戳
-          if (cachedMtime) {
-            const originalTime = new Date(cachedMtime);
-            utimesSync(filePath, originalTime, originalTime);
-            newTimestampCache[fileName] = cachedMtime;
-          } else {
-            // 没有缓存，使用当前时间作为原始时间
-            newTimestampCache[fileName] = currentMtime;
-          }
+          // elog 可能重写了文件；内容没变时恢复上一次缓存的时间
+          const originalTime = new Date(cachedMtime);
+          utimesSync(filePath, originalTime, originalTime);
+          newTimestampCache[cacheKey] = cachedMtime;
           unchangedCount++;
         }
         

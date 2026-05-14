@@ -1,9 +1,30 @@
 <script setup lang="ts">
 import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import { nextTick, provide } from 'vue'
+import { computed, nextTick, provide, ref } from 'vue'
 
-const { isDark } = useData()
+const { isDark, frontmatter } = useData()
+const isHome = computed(() => frontmatter.value.layout === 'home')
+const playModes = ['mint', 'ember', 'ink']
+const playMode = ref(0)
+const sparks = ref<{ id: number; x: number; y: number }[]>([])
+let sparkId = 0
+
+function cyclePlayMode() {
+  playMode.value = (playMode.value + 1) % playModes.length
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.playMode = playModes[playMode.value]
+  }
+}
+
+function traceSpark(event: PointerEvent) {
+  if (event.pointerType === 'touch') return
+  const id = sparkId++
+  sparks.value.push({ id, x: event.clientX, y: event.clientY })
+  window.setTimeout(() => {
+    sparks.value = sparks.value.filter(spark => spark.id !== id)
+  }, 520)
+}
 
 const enableTransitions = () =>
   'startViewTransition' in document &&
@@ -41,6 +62,34 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
 </script>
 
 <template>
+  <div
+    v-if="isHome"
+    class="home-playground"
+    :data-mode="playModes[playMode]"
+    @pointermove="traceSpark"
+  >
+    <div class="play-track">
+      <button class="play-token" type="button" aria-label="切换首页状态" @click="cyclePlayMode">
+        ✦
+      </button>
+      <div class="play-copy">
+        <span>Debugging Garden</span>
+        <strong>{{ playModes[playMode] }}</strong>
+      </div>
+      <div class="play-chips" aria-label="技术标签">
+        <a href="/blog/notion/vue">Vue</a>
+        <a href="/blog/notion/vite">Vite</a>
+        <a href="/blog/notion/notion持续部署github">Notion</a>
+        <a href="/blog/notion/问题记录">Logs</a>
+      </div>
+    </div>
+    <span
+      v-for="spark in sparks"
+      :key="spark.id"
+      class="play-spark"
+      :style="{ left: `${spark.x}px`, top: `${spark.y}px` }"
+    />
+  </div>
   <DefaultTheme.Layout />
 </template>
 

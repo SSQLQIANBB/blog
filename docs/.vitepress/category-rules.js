@@ -1,0 +1,158 @@
+const defaultCategory = '其他';
+
+const categoryRules = [
+  {
+    category: '前端',
+    subCategory: '框架',
+    keywords: ['vue', 'vue router', 'vuerouter', 'vuex', 'react', 'ref原理', '常用钩子', '父组件渲染'],
+  },
+  {
+    category: '前端',
+    subCategory: '基础',
+    keywords: [
+      'html',
+      'css',
+      'javascript',
+      'typescript',
+      'tsconfig',
+      'let',
+      'var',
+      'this指向',
+      'super',
+      '作用域',
+      '原型',
+      '类型转换',
+      'toprimitive',
+      '迭代器',
+      '生成器',
+      'data为什么是函数',
+      '对象转为可迭代对象',
+    ],
+  },
+  {
+    category: '前端',
+    subCategory: 'Web API',
+    keywords: [
+      'web api',
+      'webapi',
+      'web component',
+      'webcomponent',
+      'indexdb',
+      'websql',
+      'worker',
+      'socket',
+      'webrtc',
+      'fetch',
+      'eventsource',
+      '流式通信',
+      '简单请求',
+      '预检请求',
+      '文件上传',
+      '文件下载',
+      '分片上传',
+      '秒传',
+      'jsbridge',
+      'jsbrdige',
+    ],
+  },
+  {
+    category: '前端',
+    subCategory: '性能优化',
+    keywords: ['performance', '性能', '监控', 'core web vitals', 'resource scheduling'],
+  },
+  {
+    category: '前端',
+    subCategory: '样式',
+    keywords: ['dpr', '自适应', '滚动条', 'watermark', '水印', '布局'],
+  },
+  {
+    category: '前端',
+    subCategory: '组件',
+    keywords: ['组件', 'table', '表格', '虚拟列表', '超出省略'],
+  },
+  {
+    category: '工程化',
+    subCategory: '构建工具',
+    keywords: ['webpack', 'vite', 'rollup', 'babel'],
+  },
+  {
+    category: '工程化',
+    subCategory: '代码规范',
+    keywords: ['eslint', 'prettier', 'stylelint', 'lint'],
+  },
+  {
+    category: '工程化',
+    subCategory: '包管理',
+    keywords: ['npm', 'yarn', 'pnpm'],
+  },
+  {
+    category: '工程化',
+    subCategory: '模块化',
+    keywords: ['工程化', '模块化', 'commonjs', 'es module', 'esmodule'],
+  },
+  {
+    category: '工程化',
+    subCategory: '核心概念',
+    keywords: ['loader', 'tapable'],
+  },
+  {
+    category: '工程化',
+    subCategory: '微前端',
+    keywords: ['micro-app', '微前端'],
+  },
+  {
+    category: '工程化',
+    subCategory: '工具链',
+    keywords: ['脚手架', 'vitepress'],
+  },
+  {
+    category: '后端',
+    subCategory: 'Node.js',
+    keywords: ['node', 'node.js'],
+  },
+  {
+    category: '后端',
+    subCategory: 'Python',
+    keywords: ['python'],
+  },
+  {
+    category: '后端',
+    subCategory: '服务部署',
+    keywords: ['k8s', '服务端', '服务器', '部署'],
+  },
+  {
+    category: '后端',
+    subCategory: '其他语言',
+    keywords: ['c++'],
+  },
+  {
+    category: '计算机基础',
+    subCategory: '算法',
+    keywords: ['算法', 'leetcode', 'bfs', 'dfs', 'dp', '二叉树', '双指针', '回溯'],
+  },
+  {
+    category: '计算机基础',
+    subCategory: '网络',
+    keywords: ['计算机网络', 'tcp'],
+  },
+  {
+    category: '计算机基础',
+    subCategory: '设计与机制',
+    keywords: ['设计模式', '垃圾回收', '缓存'],
+  },
+  {
+    category: '其他',
+    subCategory: '工具',
+    keywords: ['git', 'linux', '命令'],
+  },
+  {
+    category: '其他',
+    subCategory: '记录',
+    keywords: ['问题记录', '开发注意事项', '接口问题', '日历', '远程控制', '阅读记录', '学习笔记', 'notion', 'basic', 'extra'],
+  },
+];
+
+module.exports = {
+  defaultCategory,
+  categoryRules,
+};

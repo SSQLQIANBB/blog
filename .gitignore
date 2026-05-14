@@ -2,3 +2,4 @@
 node_modules
 .elog.env
 dist
+docs/.vitepress/cache

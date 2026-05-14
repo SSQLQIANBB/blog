@@ -1,5 +1,19 @@
 import { DefaultTheme } from 'vitepress';
 
+export type CategoryRule = {
+  category: string;
+  subCategory?: string;
+  keywords: string[];
+};
+
+const categoryRuleConfig = require('./category-rules') as {
+  defaultCategory: string;
+  categoryRules: CategoryRule[];
+};
+
+export const defaultCategory = categoryRuleConfig.defaultCategory;
+export const categoryRules = categoryRuleConfig.categoryRules;
+
 // 分类映射配置（优化后的分组）
 export const categoryMap: Record<string, { text: string; order: number; icon?: string }> = {
   '前端': { text: '前端技术', order: 1, icon: '🎨' },

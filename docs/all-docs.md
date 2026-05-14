@@ -1,5 +1,6 @@
 ---
 layout: doc
+pageClass: all-docs-page
 ---
 
 # 全部文档
