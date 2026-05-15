@@ -53,6 +53,11 @@ const categoryRules = [
       '秒传',
       'jsbridge',
       'jsbrdige',
+      'cookie',
+      'csrf',
+      'xsrf',
+      'refreshToken',
+      'refresh token',
     ],
   },
   {
