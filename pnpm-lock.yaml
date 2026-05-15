@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      dayjs:
+        specifier: ^1.11.20
+        version: 1.11.20
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
@@ -1322,8 +1325,8 @@ packages:
   dateformat@2.2.0:
     resolution: {integrity: sha512-GODcnWq3YGoTnygPfi02ygEiRxqUxpJwuRHjdhJYuxpcZmDq4rjBiXYmbCCzStxo176ixfLT6i4NPwQooRySnw==}
 
-  dayjs@1.11.13:
-    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+  dayjs@1.11.20:
+    resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
 
   debounce-fn@4.0.0:
     resolution: {integrity: sha512-8pYCQiL9Xdcg0UPSD3d+0KMlOjp+KGU5EPwYddgzQ7DATsg4fuUDjQtsYLmWjnk2obnNHgV3vE2Y4jejSOJVBQ==}
@@ -3525,7 +3528,7 @@ snapshots:
   '@elog/shared@0.14.7':
     dependencies:
       chalk: 4.1.2
-      dayjs: 1.11.13
+      dayjs: 1.11.20
       image-size: 1.2.1
       lodash: 4.17.21
       mime-types: 2.1.35
@@ -4638,7 +4641,7 @@ snapshots:
 
   dateformat@2.2.0: {}
 
-  dayjs@1.11.13: {}
+  dayjs@1.11.20: {}
 
   debounce-fn@4.0.0:
     dependencies:
@@ -5501,7 +5504,7 @@ snapshots:
       d3: 7.9.0
       d3-sankey: 0.12.3
       dagre-d3-es: 7.0.11
-      dayjs: 1.11.13
+      dayjs: 1.11.20
       dompurify: 3.2.6
       katex: 0.16.22
       khroma: 2.1.0
