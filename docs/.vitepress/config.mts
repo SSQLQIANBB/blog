@@ -35,6 +35,13 @@ export default withMermaid({
       
       // 为"全部文档"页面配置侧边栏
       sidebar['/all-docs'] = generateAllDocsSidebar(allFiles);
+      sidebar['/documents-index'] = generateAllDocsSidebar(allFiles);
+      sidebar['/frontend'] = generateSidebarByCategory(allFiles, '前端');
+      sidebar['/engineering'] = generateSidebarByCategory(allFiles, '工程化');
+      sidebar['/backend'] = generateSidebarByCategory(allFiles, '后端');
+      sidebar['/computer-science'] = generateSidebarByCategory(allFiles, '计算机基础');
+      sidebar['/tools/'] = generateSidebarByCategory(allFiles, '工具效率');
+      sidebar['/work-notes'] = generateSidebarByCategory(allFiles, '工作记录');
       
       // 为每个分类创建侧边栏
       Object.keys(categoryMap).forEach(category => {
@@ -79,7 +86,7 @@ export default withMermaid({
     // },
     // 页脚编辑
     editLink: {
-      pattern: 'https://github.com/SSQLQIANBB/blog/edit/main/docs/:path',
+      pattern: 'https://github.com/SSQLQIANBB/blog/edit/master/docs/:path',
       text: '在 GitHub 上编辑此页面',
     },
     search: {
