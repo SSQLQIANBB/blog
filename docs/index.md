@@ -5,50 +5,50 @@ layout: home
 hero:
   name: "牧风夕大佬"
   text: "工程笔记与问题档案"
-  tagline: 按主题整理前端、工程化、后端与计算机基础，把踩坑记录沉淀成可检索的工作台。
+  tagline: 以“专题入口 - 文档索引 - 问题记录”的方式整理前端、工程化、后端与计算机基础，让笔记真正可浏览、可检索、可回溯。
   image:
     src: /pig.svg
     alt: 牧风夕大佬
   actions:
     - theme: brand
-      text: 浏览文档
-      link: /all-docs
-    - theme: alt
-      text: 文档索引
+      text: 进入文档索引
       link: /documents-index
     - theme: alt
-      text: 最新记录
-      link: /notion/问题记录
+      text: 全部文档
+      link: /all-docs
+    - theme: alt
+      text: 工作记录
+      link: /work-notes
 
 features:
   - icon: 📘
     title: 前端技术
     details: Vue、React、JavaScript、TypeScript 与浏览器 API 的系统笔记。
-    link: /notion/vue
-    linkText: 进入前端
+    link: /frontend
+    linkText: 查看前端专题
   - icon: ⚙️
     title: 工程化
     details: Webpack、Vite、Babel、ESLint、Prettier 与模块化实践。
-    link: /notion/webpack
-    linkText: 查看工程化
+    link: /engineering
+    linkText: 查看工程化专题
   - icon: 🔧
     title: 后端技术
     details: Node.js、Python、服务部署与接口相关问题记录。
-    link: /notion/node
-    linkText: 进入后端
+    link: /backend
+    linkText: 查看后端专题
   - icon: 💡
     title: 计算机基础
     details: 网络、缓存、设计模式、算法与面试基础知识。
-    link: /notion/计算机网络
-    linkText: 夯实基础
+    link: /computer-science
+    linkText: 查看基础专题
   - icon: 🛠️
     title: 开发工具
     details: Git、Linux、脚手架和日常效率工具的使用经验。
     link: /tools/
-    linkText: 打开工具箱
+    linkText: 查看工具专题
   - icon: 📝
     title: 工作记录
     details: 真实项目中的问题排查、接口细节和经验复盘。
-    link: /notion/问题记录
-    linkText: 查看记录
+    link: /work-notes
+    linkText: 查看工作记录
 ---
