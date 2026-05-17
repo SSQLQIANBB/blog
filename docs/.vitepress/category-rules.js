@@ -146,14 +146,19 @@ const categoryRules = [
     keywords: ['设计模式', '垃圾回收', '缓存'],
   },
   {
-    category: '其他',
+    category: '工具效率',
     subCategory: '工具',
-    keywords: ['git', 'linux', '命令'],
+    keywords: ['git', 'linux', '命令', '工具', 'notion', '持续部署'],
+  },
+  {
+    category: '工作记录',
+    subCategory: '问题与复盘',
+    keywords: ['问题记录', '开发注意事项', '接口问题', '日历', '远程控制', '学习笔记'],
   },
   {
     category: '其他',
-    subCategory: '记录',
-    keywords: ['问题记录', '开发注意事项', '接口问题', '日历', '远程控制', '阅读记录', '学习笔记', 'notion', 'basic', 'extra'],
+    subCategory: '阅读与杂记',
+    keywords: ['阅读记录', 'basic', 'extra'],
   },
 ];
 
