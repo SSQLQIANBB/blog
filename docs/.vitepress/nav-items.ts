@@ -10,10 +10,10 @@ export const specialNavItems: Record<string, { text: string; link: string }> = {
 export function generateNav(): DefaultTheme.NavItem[] {
   return [
     { text: '首页', link: '/' },
-    { text: '前端', link: '/notion/vue' },
-    { text: '后端', link: '/notion/node' },
-    { text: '工程化', link: '/notion/webpack' },
-    { text: '工作记录', link: '/notion/问题记录' },
+    { text: '前端', link: '/frontend' },
+    { text: '工程化', link: '/engineering' },
+    { text: '后端', link: '/backend' },
+    { text: '工作记录', link: '/work-notes' },
     { text: '文档索引', link: '/documents-index' },
     { text: '全部文档', link: '/all-docs' },
     { text: '关于', link: '/about' },
