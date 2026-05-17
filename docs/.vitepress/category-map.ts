@@ -17,10 +17,12 @@ export const categoryRules = categoryRuleConfig.categoryRules;
 // 分类映射配置（优化后的分组）
 export const categoryMap: Record<string, { text: string; order: number; icon?: string }> = {
   '前端': { text: '前端技术', order: 1, icon: '🎨' },
-  '工程化': { text: '工程化工具', order: 2, icon: '⚙️' },
-  '后端': { text: '后端技术', order: 3, icon: '🔧' },
+  '工程化': { text: '工程化', order: 2, icon: '⚙️' },
+  '后端': { text: '后端与服务', order: 3, icon: '🔧' },
   '计算机基础': { text: '计算机基础', order: 4, icon: '💡' },
-  '其他': { text: '其他', order: 5, icon: '📝' },
+  '工具效率': { text: '工具与效率', order: 5, icon: '🛠️' },
+  '工作记录': { text: '工作记录', order: 6, icon: '📝' },
+  '其他': { text: '其他资料', order: 7, icon: '📌' },
 };
 
 // 子分类映射（用于更细粒度的分组）
@@ -112,7 +114,7 @@ export const fileToCategoryMap: Record<string, string> = {
   'notion/vueRouter.md': '前端',
   'notion/vuex中在mutation中使用异步.md': '前端',
   'notion/webAPI.md': '前端',
-  'notion/webComponentt.md': '前端',
+  'notion/webComponent.md': '前端',
   'notion/indexDB&webSQL.md': '前端',
   'notion/worker.md': '前端',
   'notion/socket.md': '前端',
@@ -160,18 +162,22 @@ export const fileToCategoryMap: Record<string, string> = {
   'notion/TCP.md': '计算机基础',
   'notion/缓存.md': '计算机基础',
   
+  // 工具与效率
+  'notion/git.md': '工具效率',
+  'notion/linux常用命令.md': '工具效率',
+  'notion/notion持续部署github.md': '工具效率',
+  'records/index.md': '工具效率',
+  
+  // 工作记录
+  'notion/问题记录.md': '工作记录',
+  'notion/开发注意事项.md': '工作记录',
+  'notion/接口问题.md': '工作记录',
+  'notion/日历.md': '工作记录',
+  'notion/桌面远程控制功能.md': '工作记录',
+  'notion/学习笔记.md': '工作记录',
+  
   // 其他分类
-  'notion/git.md': '其他',
-  'notion/linux常用命令.md': '其他',
-  'notion/问题记录.md': '其他',
-  'notion/开发注意事项.md': '其他',
-  'notion/notion持续部署github.md': '其他',
   'notion/阅读记录.md': '其他',
-  'notion/接口问题.md': '其他',
-  'notion/日历.md': '其他',
-  'notion/桌面远程控制功能.md': '其他',
-  'notion/学习笔记.md': '其他',
-  'records/index.md': '其他',
   
   // 算法和数据结构
   'notion/LeetCode.md': '计算机基础',
@@ -187,4 +193,3 @@ export const fileToCategoryMap: Record<string, string> = {
   'notion/basic&extra.md': '其他',
 
 };
-
